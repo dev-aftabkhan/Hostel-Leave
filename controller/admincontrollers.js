@@ -1,4 +1,6 @@
-const { createWarden } = require("../services/adminService");
+const { createWarden, createAdmin } = require("../services/adminService");
+const { encryptData, decryptData } = require("../utils/cryptoUtils");
+require("dotenv").config();
 
 exports.createWarden = async (req, res) => {
   try {
@@ -22,4 +24,26 @@ exports.createWarden = async (req, res) => {
   }
 };
 
-    
+// create admin by admin only
+exports.createAdmin = async (req, res) => {
+  try {
+    const decryptedBody = decryptData(req.body.encrypted);
+    const { name, email, employee_id, phone, createdby } = decryptedBody;
+
+    const { admin, plainPassword } = await createAdmin({
+      name,
+      email,
+      employee_id,
+      phone,
+      createdby 
+    });
+
+    res.status(201).json(encryptData({
+      message: "Admin created successfully",
+      employee_id: admin.employee_id,
+      generated_password: plainPassword
+    }));
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

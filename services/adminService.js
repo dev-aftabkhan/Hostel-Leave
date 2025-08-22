@@ -1,5 +1,6 @@
 const AssistantWarden = require("../models/assist_warden");
 const SeniorWarden = require("../models/senior_warden");
+const Admin = require("../models/admin");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 
 const createWarden = async (wardenType, data) => {
@@ -48,5 +49,28 @@ const createWarden = async (wardenType, data) => {
   return { warden: newWarden, plainPassword };
 };
 
+// create admin by admin only
+const createAdmin = async (data) => {
+  const { name, email, employee_id, phone, createdby } = data;
 
-module.exports = { createWarden };
+  const existingAdmin = await Admin.findOne({ email });
+  if (existingAdmin) throw new Error("Admin with this email already exists");
+
+  const plainPassword = generatePassword(10);
+  const password_hash = await hashPassword(plainPassword);
+
+  const newAdmin = new Admin({
+    adminId: "ADMIN-" + employee_id,
+    name,
+    email,
+    employee_id,
+    password_hash,
+    phone,
+    createdby
+  });
+
+  await newAdmin.save();
+  return { admin: newAdmin, plainPassword };
+};
+
+module.exports = { createWarden, createAdmin };

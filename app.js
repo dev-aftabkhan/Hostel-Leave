@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/warden", wardenRoutes);
+app.use("/api/admin", wardenRoutes);
 
 
 module.exports = app;
