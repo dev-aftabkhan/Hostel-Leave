@@ -13,6 +13,7 @@
 .env
 node_modules/
 uploads/
+test/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

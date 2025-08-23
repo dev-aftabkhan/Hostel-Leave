@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
 
     const encryptedToken = authHeader.split(" ")[1];
     const decoded = verifyToken(encryptedToken);
-    req.user = decoded.id;
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(401).json({ error: "Unauthorized: " + err.message });

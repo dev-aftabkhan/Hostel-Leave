@@ -3,7 +3,7 @@ const { encryptData, decryptData } = require("./cryptoUtils");
 require("dotenv").config();
 
 const generateToken = (payload) => {
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "infinity" });
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "60d" });
   return encryptData({ token }); // encrypt the token
 };
 

@@ -1,57 +1,45 @@
-const AssistantWarden = require("../models/assist_warden");
-const SeniorWarden = require("../models/senior_warden");
+const Warden = require("../models/warden");
 const Admin = require("../models/admin");
+const Hostel = require("../models/hostel");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
+const { generateToken } = require("../utils/jwtUtils");
 
+// ✅ Create Warden (senior or assistant -> handled by role)
 const createWarden = async (wardenType, data) => {
-  const { name, employee_id, hostel, phone, email } = data;
+  const { name, emp_id, hostel_id, phone_no, email } = data;
 
-  // ✅ Check if hostel already has a warden of this type
-  if (wardenType === "assistant") {
-    const existingAsst = await AssistantWarden.findOne({ hostel });
-    if (existingAsst) throw new Error(`Hostel ${hostel} already has an Assistant Warden`);
-  } else if (wardenType === "senior") {
-    const existingSenior = await SeniorWarden.findOne({ hostel });
-    if (existingSenior) throw new Error(`Hostel ${hostel} already has a Senior Warden`);
-  } else {
-    throw new Error("Invalid warden type");
+  if (!["senior_warden", "warden"].includes(wardenType)) {
+    throw new Error("Invalid warden type (must be senior_warden or warden)");
+  }
+
+  // only one senior per hostel
+  if (wardenType === "senior_warden" || wardenType === "warden") {
+    const existingWarden = await Warden.findOne({ hostel_id, role: wardenType });
+    if (existingWarden) throw new Error(`Hostel ${hostel_id} already has a ${wardenType}`);
   }
 
   const plainPassword = generatePassword(10);
   const password_hash = await hashPassword(plainPassword);
 
-  let newWarden;
-  if (wardenType === "assistant") {
-    newWarden = new AssistantWarden({
-      asst_warden_Id: "ASST-" + employee_id,
-      name,
-      hostel,
-      employee_id,
-      password_hash,
-      phone,
-      email
-    });
-  } else if (wardenType === "senior") {
-    newWarden = new SeniorWarden({
-      sen_warden_Id: "SEN-" + employee_id,
-      name,
-      hostel,
-      employee_id,
-      password_hash,
-      phone,
-      email
-    });
-  } else {
-    throw new Error("Invalid warden type");
-  }
+  const newWarden = new Warden({
+    warden_id: wardenType.toUpperCase() + "-" + emp_id,
+    emp_id,
+    hostel_id,
+    name,
+    password_hash,
+    phone_no,
+    email,
+    created_by: "super_admin",
+    role: wardenType
+  });
 
   await newWarden.save();
   return { warden: newWarden, plainPassword };
 };
 
-// create admin by admin only
+// ✅ Create Admin
 const createAdmin = async (data) => {
-  const { name, email, employee_id, phone, createdby } = data;
+  const { name, email, emp_id, phone_no } = data;
 
   const existingAdmin = await Admin.findOne({ email });
   if (existingAdmin) throw new Error("Admin with this email already exists");
@@ -60,17 +48,51 @@ const createAdmin = async (data) => {
   const password_hash = await hashPassword(plainPassword);
 
   const newAdmin = new Admin({
-    adminId: "ADMIN-" + employee_id,
+    admin_id: "ADMIN-" + emp_id,
+    emp_id,
     name,
-    email,
-    employee_id,
     password_hash,
-    phone,
-    createdby
+    phone_no,
+    email,
+    created_by: "super_admin",
   });
 
   await newAdmin.save();
   return { admin: newAdmin, plainPassword };
 };
 
-module.exports = { createWarden, createAdmin };
+// ✅ Create Hostel
+const createHostel = async (data) => {
+  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed } = data;
+
+  const existingHostel = await Hostel.findOne({ hostel_name });
+  if (existingHostel) throw new Error("Hostel with this name already exists");
+
+  const newHostel = new Hostel({
+    hostel_id: "HOSTEL-" + hostel_name.replace(/\s+/g, "-").toUpperCase(),
+    hostel_name,
+    check_out_start_time,
+    latest_return_time,
+    outing_allowed,
+  });
+
+  await newHostel.save();
+  return newHostel;
+};
+
+// login admin
+const loginAdmin = async (emp_id, password) => {
+  const admin = await Admin.findOne({ emp_id });
+  if (!admin) throw new Error("Admin not found");
+
+  const isMatch = await comparePassword(password, admin.password_hash);
+  if (!isMatch) throw new Error("Invalid credentials");
+
+  // ✅ generate encrypted JWT
+  const token = generateToken({ id: admin.admin_id, role: "admin", emp_id: admin.emp_id });
+
+  return { token };
+};
+
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin };

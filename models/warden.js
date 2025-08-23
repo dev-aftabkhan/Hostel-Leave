@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const adminSchema = new mongoose.Schema({
-  admin_id: { type: String, unique: true, required: true },
+const WardenSchema = new mongoose.Schema({
+  warden_id: { type: String, unique: true, required: true },
   emp_id: { type: String, required: true },
   name: { type: String, required: true },
   password_hash: { type: String, required: true },
@@ -11,7 +11,11 @@ const adminSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   updated_by: { type: String },
   updated_at: { type: Date, default: Date.now },
-  profile_pic: { type: String }
+  fcm_tokens: [{ type: String }],
+  hostel_id: { type: String, required: true },
+  language_preferences: { type: String },
+  profile_pic: { type: String },
+  role: { type: String, enum: ["senior_warden", "warden"], required: true }
 });
 
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = mongoose.model("Warden", WardenSchema);
