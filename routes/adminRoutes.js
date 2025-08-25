@@ -8,6 +8,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post("/create-warden", authMiddleware, admincontroller.createWarden);
 router.post("/create-admin", authMiddleware, admincontroller.createAdmin);
 router.post("/create-hostel", authMiddleware, admincontroller.createHostel);
+router.post("/create-student", authMiddleware, admincontroller.createStudent);
 router.post("/login/admin", admincontroller.adminLogin);
 
 module.exports = router;

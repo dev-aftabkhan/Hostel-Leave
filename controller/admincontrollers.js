@@ -92,3 +92,66 @@ exports.adminLogin = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+exports.createStudent = async (req, res) => {
+  try {
+    const decryptedBody = decryptData(req.body.encrypted);
+
+    const {
+      enrollment_no,
+      name,
+      email,
+      phone_no,
+      hostel_id,
+      room_no,
+      semester,
+      branch,
+      parent1_name,
+      parent1_phone,
+      parent1_relation,
+      parent2_name,
+      parent2_phone,
+      parent2_relation,
+    } = decryptedBody;
+
+    const studentData = {
+      enrollment_no,
+      name,
+      email,
+      phone_no,
+      hostel_id,
+      room_no,
+      semester,
+      branch
+    };
+
+    const parentsData = [];
+    if (parent1_name && parent1_phone) {
+      parentsData.push({
+        name: parent1_name,
+        phone_no: parent1_phone,
+        relation: parent1_relation || "Parent"
+      });
+    }
+    if (parent2_name && parent2_phone) {
+      parentsData.push({
+        name: parent2_name,
+        phone_no: parent2_phone,
+        relation: parent2_relation || "Parent"
+      });
+    }
+    const created_by = req.user.id; // from auth middleware
+
+    const { student, parents, password } = await adminService.createStudentWithParents(studentData, parentsData, created_by);
+
+    res.status(201).json(encryptData({
+      message: "Student and parents created successfully",
+      student,
+      parents,
+      password
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
+

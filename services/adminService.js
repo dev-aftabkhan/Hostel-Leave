@@ -1,12 +1,18 @@
 const Warden = require("../models/warden");
 const Admin = require("../models/admin");
 const Hostel = require("../models/hostel");
+const Student = require("../models/student");
+const Parent  = require("../models/parent");
+const { v4: uuidv4 } = require("uuid");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
 // ✅ Create Warden (senior or assistant -> handled by role)
 const createWarden = async (wardenType, data) => {
   const { name, emp_id, hostel_id, phone_no, email } = data;
+
+  const existingWarden = await Warden.findOne({ emp_id });
+  if (existingWarden) throw new Error("Warden with this emp_id already exists");
 
   if (!["senior_warden", "warden"].includes(wardenType)) {
     throw new Error("Invalid warden type (must be senior_warden or warden)");
@@ -29,7 +35,7 @@ const createWarden = async (wardenType, data) => {
     password_hash,
     phone_no,
     email,
-    created_by: "super_admin",
+    created_by: req.user.id,
     role: wardenType
   });
 
@@ -54,7 +60,7 @@ const createAdmin = async (data) => {
     password_hash,
     phone_no,
     email,
-    created_by: "super_admin",
+    created_by: req.user.id,
   });
 
   await newAdmin.save();
@@ -74,6 +80,7 @@ const createHostel = async (data) => {
     check_out_start_time,
     latest_return_time,
     outing_allowed,
+    created_by: req.user.id,
   });
 
   await newHostel.save();
@@ -94,5 +101,53 @@ const loginAdmin = async (emp_id, password) => {
   return { token };
 };
 
+async function createStudentWithParents(studentData, parentsData, created_by) {
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin };
+  const existingStudent = await Student.findOne({ enrollment_no: studentData.enrollment_no });
+  if (existingStudent) throw new Error("Student with this enrollment number already exists");
+
+  const student_id = "STU_" + uuidv4().slice(0, 8);
+  const plainPassword = generatePassword(10);
+  const password_hash = await hashPassword(plainPassword);
+
+
+  const student = new Student({
+    ...studentData,
+    student_id,
+    password_hash,
+    created_by,
+  });
+  await student.save();
+
+  const savedParents = [];
+  for (let parent of parentsData) {
+    let parentDoc = await Parent.findOne({ phone_no: parent.phone_no });
+
+    if (parentDoc) {
+      // already exists → just add new student enrollment if not present
+      if (!parentDoc.student_enrollment_no.includes(student.enrollment_no)) {
+        parentDoc.student_enrollment_no.push(student.enrollment_no);
+      }
+      parentDoc.updated_by = created_by;
+      parentDoc.relation = parent.relation; // update relation if needed
+      await parentDoc.save();
+    } else {
+      // create new parent
+      const parent_id = "PAR_" + uuidv4().slice(0, 8);
+      parentDoc = new Parent({
+        parent_id,
+        student_enrollment_no: [student.enrollment_no],
+        name: parent.name,
+        phone_no: parent.phone_no,
+        relation: parent.relation,
+        created_by,
+      });
+      await parentDoc.save();
+    }
+    savedParents.push(parentDoc);
+  }
+
+  return { student, parents: savedParents, password: plainPassword };
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents };

@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const adminRoutes = require("./routes/adminRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
+const studentRoutes = require("./routes/studentRoutes");
 
 
 dotenv.config();
@@ -17,5 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/warden", wardenRoutes);
+app.use("/api/student", studentRoutes);
 
 module.exports = app;
