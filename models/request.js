@@ -1,0 +1,47 @@
+const mongoose = require("mongoose");
+
+const requestSchema = new mongoose.Schema({
+  request_id: { type: String, default: mongoose.Types.ObjectId },
+  request_type: { type: String, enum: ["leave", "outing"], required: true },
+  student_enrollment_number: { type: String, required: true },
+  applied_at: { type: Date, default: Date.now },
+  applied_from: { type: Date, required: true },
+  applied_to: { type: Date, required: true },
+  reason: { type: String, required: true },
+  request_status: {
+    type: String,
+    enum: [
+      "requested",
+      "referred_to_parent",
+      "cancelled_assistent_warden",
+      "accepted_by_parent",
+      "rejected_by_parent",
+      "accepted_by_warden",
+      "rejected_by_warden"
+    ],
+    default: "requested"
+  },
+  active: { type: Boolean, default: true },
+  last_updated_at: { type: Date, default: Date.now },
+
+  parent_action: {
+    action_by: { type: String, ref: "Parent" },
+    action: { type: String, enum: ["accepted", "rejected"] }
+  },
+  assistent_warden_action: {
+    action_by: { type: String, ref: "Senior_Warden" },
+    action: { type: String, enum: ["cancelled", "accepted"] }
+  },
+  senior_warden_action: {
+    action_by: { type: String, ref: "Senior_Warden" },
+    action: { type: String, enum: ["accepted", "rejected"] }
+  },
+  security_guard_action: {
+    action_by: { type: String, ref: "Security_Guard" },
+    action: { type: String, enum: ["in", "out", "pending", "expired"] }
+  },
+  parent_remark: { type: String },
+  created_by: { type: String, ref: "user" }
+});
+
+module.exports = mongoose.model("Request", requestSchema);

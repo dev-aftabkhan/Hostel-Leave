@@ -1,6 +1,8 @@
 const Student = require("../models/student");
 const Hostel = require("../models/hostel");
 const Branch = require("../models/branch");
+const request = require("../models/request"); 
+const mongoose = require("mongoose"); 
 const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
@@ -97,4 +99,33 @@ exports.getStudentById = async (studentId) => {
   const student = await Student.findOne({ student_id: studentId });
   if (!student) throw new Error("Student not found");
   return student;
+};
+
+// create request with proper validation
+exports.createRequest = async (requestData) => {
+  const { request_type, student_enrollment_number, applied_from, applied_to, reason, created_by } = requestData;
+
+  // Validate required fields
+  if (!request_type || !student_enrollment_number || !applied_from || !applied_to || !reason || !created_by) {
+    throw new Error("All fields are required");
+  }
+  // request_id is generated automatically
+  requestData.request_id =  new mongoose.Types.ObjectId().toString();
+  // Create and save the request
+  const newRequest = new request(requestData);
+  await newRequest.save();
+  return newRequest;
+};
+
+// get all requests by id
+exports.getAllRequestsByStudentId = async (studentId) => {
+  const requests = await request.find({ student_id: studentId });
+  return requests;
+};
+
+// get request by ID
+exports.getRequestById = async (requestId) => {
+  const requests = await request.findOne({ request_id: requestId });
+  if (!requests) throw new Error("Request not found");
+  return requests;
 };

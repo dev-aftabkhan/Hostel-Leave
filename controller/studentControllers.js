@@ -119,3 +119,50 @@ exports.getStudentById = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// create request
+exports.createRequest = async (req, res) => {
+  try {
+    const requestData = decryptData(req.body.encrypted);
+    const student_enrollment_number = req.user.enrollment_no;
+    const created_by = req.user.student_id;
+    const newRequest = await studentService.createRequest({ ...requestData, student_enrollment_number, created_by });
+
+    res.status(201).json(encryptData({
+      message: "Request created successfully",
+      request: newRequest
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
+
+// get all requests by student ID
+exports.getAllRequestsByStudentId = async (req, res) => {
+  try {
+    const studentId = req.user.student_enrollment_number;
+    const requests = await studentService.getAllRequestsByStudentId(studentId);
+
+    res.status(200).json(encryptData({
+      message: "All requests retrieved successfully",
+      requests
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
+
+// get request by ID
+exports.getRequestById = async (req, res) => {
+  try {
+    const requestId = req.params.id;
+    const request = await studentService.getRequestById(requestId);
+
+    res.status(200).json(encryptData({
+      message: "Request retrieved successfully",
+      request
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};

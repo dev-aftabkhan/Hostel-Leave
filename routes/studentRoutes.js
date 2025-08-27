@@ -20,4 +20,13 @@ router.get("/all-branches", authMiddleware, studentControllers.getAllBranches);
 // get student by ID
 router.get("/student-profile", authMiddleware, studentControllers.getStudentById);
 
+// create request
+router.post("/create-request", authMiddleware, studentControllers.createRequest);
+
+// get all requests by student ID
+router.get("/requests", authMiddleware, studentControllers.getAllRequestsByStudentId);
+
+// get request by ID
+router.get("/requests/:id", authMiddleware, studentControllers.getRequestById);
+
 module.exports = router;
