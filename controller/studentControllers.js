@@ -75,3 +75,31 @@ exports.getHostelInfo = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// all-hostel-info
+exports.getAllHostelInfo = async (req, res) => {
+  try {
+    const hostels = await studentService.getAllHostelInfo();
+
+    res.status(200).json(encryptData({
+      message: "All hostel information retrieved successfully",
+      hostels
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
+
+// all branches
+exports.getAllBranches = async (req, res) => {
+  try {
+    const branches = await studentService.getAllBranches();
+
+    res.status(200).json(encryptData({
+      message: "All branch information retrieved successfully",
+      branches
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};

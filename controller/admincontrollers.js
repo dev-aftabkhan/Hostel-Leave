@@ -7,13 +7,14 @@ exports.createWarden = async (req, res) => {
     // 🔓 decrypt incoming body
     const decryptedBody = decryptData(req.body.encrypted);
     const { wardenType, name, emp_id, hostel_id, phone_no, email } = decryptedBody;
-
+    const created_by = req.user.admin_id; // from auth middleware
     const { warden, plainPassword } = await adminService.createWarden(wardenType, {
       name,
       emp_id,
       hostel_id,
       phone_no,
       email,
+      created_by
     });
 
     // 🔐 encrypt response
@@ -33,12 +34,13 @@ exports.createAdmin = async (req, res) => {
     // 🔓 decrypt incoming body
     const decryptedBody = decryptData(req.body.encrypted);
     const { name, email, emp_id, phone_no } = decryptedBody;
-
+    const created_by = req.user.admin_id; // from auth middleware
     const { admin, plainPassword } = await adminService.createAdmin({
       name,
       email,
       emp_id,
       phone_no,
+      created_by
     });
 
     // 🔐 encrypt response
@@ -58,12 +60,13 @@ exports.createHostel = async (req, res) => {
     // 🔓 decrypt incoming body
     const decryptedBody = decryptData(req.body.encrypted);
     const { hostel_name, check_out_start_time, latest_return_time, outing_allowed } = decryptedBody;
-
+    const created_by = req.user.admin_id; // from auth middleware
     const hostel = await adminService.createHostel({
       hostel_name,
       check_out_start_time,
       latest_return_time,
       outing_allowed,
+      created_by
     });
 
     // 🔐 encrypt response

@@ -12,4 +12,10 @@ router.put("/profile", authMiddleware, upload.single("profile_pic"), studentCont
 // hostel-info
 router.get("/hostel-info", authMiddleware, studentControllers.getHostelInfo);
 
+// all-hostel-info
+router.get("/all-hostel-info", authMiddleware, studentControllers.getAllHostelInfo);
+
+// all-branches
+router.get("/all-branches", authMiddleware, studentControllers.getAllBranches);
+
 module.exports = router;

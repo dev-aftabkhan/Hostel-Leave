@@ -1,5 +1,6 @@
 const Student = require("../models/student");
 const Hostel = require("../models/hostel");
+const Branch = require("../models/branch");
 const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
@@ -67,4 +68,26 @@ exports.getHostelInfoByStudent = async (studentId) => {
       outing_allowed: hostel.outing_allowed,
     },
   };
+};
+
+// get all hostel information
+exports.getAllHostelInfo = async () => {
+  const hostels = await Hostel.find();
+  return hostels.map(hostel => ({
+    hostel_id: hostel.hostel_id,
+    name: hostel.hostel_name,
+    check_out_start_time: hostel.check_out_start_time,
+    latest_return_time: hostel.latest_return_time,
+    outing_allowed: hostel.outing_allowed,
+  }));
+};
+
+// get all branches
+exports.getAllBranches = async () => {
+  const branches = await Branch.find();
+  return branches.map(branch => ({
+    branch_id: branch.branch_id,
+    name: branch.branch_name,
+    max_semester: branch.max_semester
+  }));
 };

@@ -10,7 +10,7 @@ const { generateToken } = require("../utils/jwtUtils");
 
 // ✅ Create Warden (senior or assistant -> handled by role)
 const createWarden = async (wardenType, data) => {
-  const { name, emp_id, hostel_id, phone_no, email } = data;
+  const { name, emp_id, hostel_id, phone_no, email, created_by } = data;
 
   const existingWarden = await Warden.findOne({ emp_id });
   if (existingWarden) throw new Error("Warden with this emp_id already exists");
@@ -36,7 +36,7 @@ const createWarden = async (wardenType, data) => {
     password_hash,
     phone_no,
     email,
-    created_by: req.user.id,
+    created_by,
     role: wardenType
   });
 
@@ -46,7 +46,7 @@ const createWarden = async (wardenType, data) => {
 
 // ✅ Create Admin
 const createAdmin = async (data) => {
-  const { name, email, emp_id, phone_no } = data;
+  const { name, email, emp_id, phone_no, created_by } = data;
 
   const existingAdmin = await Admin.findOne({ email });
   if (existingAdmin) throw new Error("Admin with this email already exists");
@@ -61,7 +61,7 @@ const createAdmin = async (data) => {
     password_hash,
     phone_no,
     email,
-    created_by: req.user.id,
+    created_by,
   });
 
   await newAdmin.save();
@@ -70,7 +70,7 @@ const createAdmin = async (data) => {
 
 // ✅ Create Hostel
 const createHostel = async (data) => {
-  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed } = data;
+  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, created_by } = data;
 
   const existingHostel = await Hostel.findOne({ hostel_name });
   if (existingHostel) throw new Error("Hostel with this name already exists");
@@ -81,7 +81,7 @@ const createHostel = async (data) => {
     check_out_start_time,
     latest_return_time,
     outing_allowed,
-    created_by: req.user.id,
+    created_by,
   });
 
   await newHostel.save();
