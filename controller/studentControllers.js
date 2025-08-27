@@ -6,15 +6,16 @@ exports.loginStudent = async (req, res) => {
   try {
     // 🔓 Decrypt body
     const decryptedBody = decryptData(req.body.encrypted);
-    const { enrollment_no, password } = decryptedBody;
+    const { enrollment_no, password, fcm_token } = decryptedBody;
 
-    const { token, student } = await studentService.loginStudent(enrollment_no, password);
+    const { token, student } = await studentService.loginStudent(enrollment_no, password, fcm_token);
 
     // 🔐 Encrypt response
     res.status(200).json(encryptData({
       message: "Login successful",
       enrollment_no: student.enrollment_no,
       name: student.name,
+      profile_pic: student.profile_pic,
       token
     }));
   } catch (err) {
@@ -54,6 +55,21 @@ exports.updateProfile = async (req, res) => {
         semester: updatedStudent.semester,
         branch: updatedStudent.branch
       }
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
+
+// hostel-info
+exports.getHostelInfo = async (req, res) => {
+  try {
+    const studentId = req.user.student_id;
+    const hostelInfo = await studentService.getHostelInfoByStudent(studentId);
+
+    res.status(200).json(encryptData({
+      message: "Hostel information retrieved successfully",
+      hostel: hostelInfo.hostel
     }));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));

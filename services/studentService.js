@@ -1,13 +1,20 @@
- const Student = require("../models/student");
+const Student = require("../models/student");
+const Hostel = require("../models/hostel");
 const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
-exports.loginStudent = async (enrollment_no, password) => {
+exports.loginStudent = async (enrollment_no, password, fcm_token) => {
   const student = await Student.findOne({ enrollment_no });
   if (!student) throw new Error("Invalid enrollment number or password");
 
   const isMatch = await comparePassword(password, student.password_hash);
   if (!isMatch) throw new Error("Invalid enrollment number or password");
+  
+   // ✅ update FCM token in DB
+    if (fcm_token) {
+      student.fcm_tokens = fcm_token;
+      await student.save();  // <-- this actually saves it
+    }
 
   // ✅ Generate JWT token
   const token = generateToken({
@@ -15,6 +22,8 @@ exports.loginStudent = async (enrollment_no, password) => {
     enrollment_no: student.enrollment_no,
     role: "student"
   });
+  // save fcm token
+  await student.updateOne({ fcm_token });
 
   return { token, student };
 };
@@ -39,4 +48,23 @@ exports.updateStudentProfile = async (studentId, updates) => {
 
   if (!student) throw new Error("Student not found");
   return student;
+};
+
+// export hostel-info by student
+exports.getHostelInfoByStudent = async (studentId) => {
+  const student = await Student.findOne({ student_id: studentId });
+  if (!student) throw new Error("Student not found");
+
+  const hostel = await Hostel.findOne({ hostel_id: student.hostel_id });
+  if (!hostel) throw new Error("Hostel not found");
+
+  return {
+    hostel: {
+      hostel_id: hostel.hostel_id,
+      name: hostel.hostel_name,
+      check_out_start_time: hostel.check_out_start_time,
+      latest_return_time: hostel.latest_return_time,
+      outing_allowed: hostel.outing_allowed,
+    },
+  };
 };

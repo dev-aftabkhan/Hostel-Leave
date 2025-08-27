@@ -9,5 +9,7 @@ router.post("/login", studentControllers.loginStudent);
 
 // Student Update Profile API
 router.put("/profile", authMiddleware, upload.single("profile_pic"), studentControllers.updateProfile);
+// hostel-info
+router.get("/hostel-info", authMiddleware, studentControllers.getHostelInfo);
 
 module.exports = router;
