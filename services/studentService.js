@@ -91,3 +91,10 @@ exports.getAllBranches = async () => {
     max_semester: branch.max_semester
   }));
 };
+
+// get student by ID
+exports.getStudentById = async (studentId) => {
+  const student = await Student.findOne({ student_id: studentId });
+  if (!student) throw new Error("Student not found");
+  return student;
+};

@@ -103,3 +103,19 @@ exports.getAllBranches = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// get student by ID
+exports.getStudentById = async (req, res) => {
+  try {
+    const studentId = req.user.student_id;
+    console.log("Authenticated Student ID:", studentId);
+    const student = await studentService.getStudentById(studentId);
+
+    res.status(200).json(encryptData({
+      message: "Student information retrieved successfully",
+      student
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};

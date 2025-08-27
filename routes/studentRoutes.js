@@ -17,5 +17,7 @@ router.get("/all-hostel-info", authMiddleware, studentControllers.getAllHostelIn
 
 // all-branches
 router.get("/all-branches", authMiddleware, studentControllers.getAllBranches);
+// get student by ID
+router.get("/student-profile", authMiddleware, studentControllers.getStudentById);
 
 module.exports = router;
