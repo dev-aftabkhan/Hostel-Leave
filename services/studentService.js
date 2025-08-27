@@ -19,4 +19,24 @@ exports.loginStudent = async (enrollment_no, password) => {
   return { token, student };
 };
 
- 
+exports.updateStudentProfile = async (studentId, updates) => {
+  const allowedFields = ["hostel_id", "profile_pic", "room_no", "semester", "branch"];
+  const filteredUpdates = {};
+
+  // ✅ Pick only allowed fields
+  for (let key of allowedFields) {
+    if (updates[key] !== undefined) {
+      filteredUpdates[key] = updates[key];
+    }
+  }
+
+  // 🔑 Use student_id instead of _id
+  const student = await Student.findOneAndUpdate(
+    { student_id: studentId },        // match by student_id
+    { $set: filteredUpdates },
+    { new: true }
+  );
+
+  if (!student) throw new Error("Student not found");
+  return student;
+};

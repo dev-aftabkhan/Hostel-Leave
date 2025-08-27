@@ -10,5 +10,6 @@ router.post("/create-admin", authMiddleware, admincontroller.createAdmin);
 router.post("/create-hostel", authMiddleware, admincontroller.createHostel);
 router.post("/create-student", authMiddleware, admincontroller.createStudent);
 router.post("/login/admin", admincontroller.adminLogin);
+router.post("/create-branch", authMiddleware, admincontroller.createBranch);
 
 module.exports = router;

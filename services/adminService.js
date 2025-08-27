@@ -3,6 +3,7 @@ const Admin = require("../models/admin");
 const Hostel = require("../models/hostel");
 const Student = require("../models/student");
 const Parent  = require("../models/parent");
+const Branch = require("../models/branch");
 const { v4: uuidv4 } = require("uuid");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
@@ -150,4 +151,22 @@ async function createStudentWithParents(studentData, parentsData, created_by) {
   return { student, parents: savedParents, password: plainPassword };
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents };
+// create branch
+const createBranch = async (data) => {
+  const { branch_name, max_semester, created_by } = data;
+
+  const existingBranch = await Branch.findOne({ branch_name });
+  if (existingBranch) throw new Error("Branch with this name already exists");
+
+  const newBranch = new Branch({
+    branch_id: "BRANCH-" + branch_name.replace(/\s+/g, "-").toUpperCase(),
+    branch_name,
+    max_semester,
+    created_by
+  });
+
+  await newBranch.save();
+  return newBranch;
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch };

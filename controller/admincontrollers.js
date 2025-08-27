@@ -155,3 +155,26 @@ exports.createStudent = async (req, res) => {
   }
 };
 
+// ✅ Create Branch
+exports.createBranch = async (req, res) => {
+  try {
+    // 🔓 decrypt incoming body
+    const decryptedBody = decryptData(req.body.encrypted);
+    const { branch_name, max_semester } = decryptedBody;
+    const created_by = req.user.id; // from auth middleware
+
+    const branch = await adminService.createBranch({
+      branch_name,
+      max_semester,
+      created_by
+    });
+
+    // 🔐 encrypt response
+    res.status(201).json(encryptData({
+      message: "Branch created successfully",
+      branch
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
