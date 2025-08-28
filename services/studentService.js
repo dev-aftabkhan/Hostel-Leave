@@ -1,4 +1,5 @@
 const Student = require("../models/student");
+const Parent = require("../models/parent");
 const Hostel = require("../models/hostel");
 const Branch = require("../models/branch");
 const request = require("../models/request"); 
@@ -97,8 +98,10 @@ exports.getAllBranches = async () => {
 // get student by ID
 exports.getStudentById = async (studentId) => {
   const student = await Student.findOne({ student_id: studentId });
+  // parents-info
+  const parentsInfo = await Parent.find({ student_enrollment_no: student.enrollment_no });
   if (!student) throw new Error("Student not found");
-  return student;
+  return { student, parentsInfo };
 };
 
 // create request with proper validation
