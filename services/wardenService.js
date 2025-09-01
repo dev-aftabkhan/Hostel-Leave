@@ -11,7 +11,7 @@ const loginWarden = async (emp_id, wardenType, password) => {
   if (!isMatch) throw new Error("Invalid credentials");
 
   // ✅ generate encrypted JWT
-  const token = generateToken({ id: warden._id, role: warden.role, emp_id: warden.emp_id });
+  const token = generateToken({ id: warden.warden_id, role: warden.role, emp_id: warden.emp_id });
 
   return { token };
 };

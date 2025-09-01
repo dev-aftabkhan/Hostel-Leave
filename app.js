@@ -6,6 +6,7 @@ const path = require('path');
 const adminRoutes = require("./routes/adminRoutes");
 const wardenRoutes = require("./routes/wardenRoutes");
 const studentRoutes = require("./routes/studentRoutes");
+const requestRoutes = require("./routes/requestRoutes");
 
 
 dotenv.config();
@@ -21,5 +22,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/admin", adminRoutes);
 app.use("/api/warden", wardenRoutes);
 app.use("/api/student", studentRoutes);
+app.use("/api/request", requestRoutes);
 
 module.exports = app;

@@ -12,6 +12,7 @@ const requestSchema = new mongoose.Schema({
     type: String,
     enum: [
       "requested",
+      "cancelled_by_student",
       "referred_to_parent",
       "cancelled_assistent_warden",
       "accepted_by_parent",
@@ -26,15 +27,15 @@ const requestSchema = new mongoose.Schema({
 
   parent_action: {
     action_by: { type: String, ref: "Parent" },
-    action: { type: String, enum: ["accepted", "rejected"] }
+    action: { type: String, enum: ["accepted_by_parent", "rejected_by_parent"] }
   },
   assistent_warden_action: {
-    action_by: { type: String, ref: "Senior_Warden" },
-    action: { type: String, enum: ["cancelled", "accepted"] }
+    action_by: { type: String, ref: "assistent_Warden" },
+    action: { type: String, enum: ["cancelled_assistent_warden", "referred_to_parent"] }
   },
   senior_warden_action: {
     action_by: { type: String, ref: "Senior_Warden" },
-    action: { type: String, enum: ["accepted", "rejected"] }
+    action: { type: String, enum: ["accepted_by_warden", "rejected_by_warden"] }
   },
   security_guard_action: {
     action_by: { type: String, ref: "Security_Guard" },

@@ -22,7 +22,7 @@ exports.loginStudent = async (enrollment_no, password, fcm_token) => {
 
   // ✅ Generate JWT token
   const token = generateToken({
-    student_id: student.student_id,
+    id: student.student_id,
     enrollment_no: student.enrollment_no,
     role: "student"
   });
