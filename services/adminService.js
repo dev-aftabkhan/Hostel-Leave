@@ -169,4 +169,40 @@ const createBranch = async (data) => {
   return newBranch;
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch };
+// reset password by id for all by checking previous password
+const resetPasswordById = async (user_id, oldPassword, newPassword) => {
+  const admin = await Admin.findOne({ admin_id: user_id });
+
+   if (admin) {
+     const isMatch = await comparePassword(oldPassword, admin.password_hash);
+     if (!isMatch) throw new Error("Old password is incorrect");
+
+     admin.password_hash = await hashPassword(newPassword);
+     await admin.save();
+   } else {
+      // for warden
+      const warden = await Warden.findOne({ warden_id: user_id });
+      if (warden) {
+        const isMatch = await comparePassword(oldPassword, warden.password_hash);
+        if (!isMatch) throw new Error("Old password is incorrect");
+
+        warden.password_hash = await hashPassword(newPassword);
+        await warden.save();
+      } else {
+        // for student
+        const student = await Student.findOne({ student_id: user_id });
+        if (student) {
+          const isMatch = await comparePassword(oldPassword, student.password_hash);
+          if (!isMatch) throw new Error("Old password is incorrect");
+
+          student.password_hash = await hashPassword(newPassword);
+          await student.save();
+        }
+      }
+    }
+
+
+  return { message: "Password reset successfully" };
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById };

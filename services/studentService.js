@@ -122,7 +122,8 @@ exports.createRequest = async (requestData) => {
 
 // get all requests by id
 exports.getAllRequestsByStudentId = async (studentId) => {
-  const requests = await request.find({ student_id: studentId });
+  // get by latest first
+  const requests = await request.find({ student_id: studentId }).sort({ created_at: -1 });
   return requests;
 };
 

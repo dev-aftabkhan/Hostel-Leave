@@ -181,3 +181,20 @@ exports.createBranch = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// reset password
+exports.resetPassword = async (req, res) => {
+  try {
+    const decryptedBody = decryptData(req.body.encrypted);
+    const { oldPassword, newPassword } = decryptedBody;
+    const user_id = req.user.id; // from auth middleware
+
+    const result = await adminService.resetPasswordById(user_id, oldPassword, newPassword);
+
+    res.status(200).json(encryptData({
+      message: result.message
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};

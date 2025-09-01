@@ -42,7 +42,7 @@ const requestSchema = new mongoose.Schema({
     action: { type: String, enum: ["in", "out", "pending", "expired"] }
   },
   parent_remark: { type: String },
-  created_by: { type: String, ref: "user" }
-});
+  created_by: { type: String, ref: "user" },
+}, { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } });
 
 module.exports = mongoose.model("Request", requestSchema);
