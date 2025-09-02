@@ -141,14 +141,11 @@ exports.createRequest = async (req, res) => {
 exports.getAllRequestsByStudentId = async (req, res) => {
   try {
     const studentId = await studentService.getStudentById(req.user.student_id);
-    const { requests, seniorWarden, assistantWarden } = await studentService.getAllRequestsByStudentId(studentId);
+    const requests = await studentService.getAllRequestsByStudentId(studentId);
 
     res.status(200).json(encryptData({
       message: "All requests retrieved successfully",
-      requests,
-      seniorWarden,
-      assistantWarden,
-      studentId
+      requests
     }));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));
@@ -159,11 +156,15 @@ exports.getAllRequestsByStudentId = async (req, res) => {
 exports.getRequestById = async (req, res) => {
   try {
     const requestId = req.params.id;
-    const request = await studentService.getRequestById(requestId);
+    const studentId = await studentService.getStudentById(req.user.student_id);
+    const { requests, seniorWarden, assistantWarden } = await studentService.getRequestById(requestId, studentId);
 
     res.status(200).json(encryptData({
       message: "Request retrieved successfully",
-      request
+      request: requests,  // Assuming you want the first request
+      seniorWarden,
+      assistantWarden,
+      studentId
     }));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));

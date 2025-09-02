@@ -125,8 +125,19 @@ exports.createRequest = async (requestData) => {
 exports.getAllRequestsByStudentId = async (studentId) => {
   const student = studentId.student;
   // get by latest first
-  const requests = await request.find({ student_id: student.student_enrollment_number }).sort({ created_at: -1 }).select("-password_hash");
+  const requests = await request.find({ student_id: student.student_enrollment_number }).sort({ created_at: -1 });
   if (!requests) throw new Error("No requests found for this student");
+
+  return requests;
+};
+
+// get request by ID
+exports.getRequestById = async (requestId, studentId) => {
+
+  const student = studentId.student;
+  const requests = await request.findOne({ request_id: requestId });
+  if (!requests) throw new Error("Request not found");
+
   // get senior_warden
   const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash");
   if (!seniorWarden) throw new Error("Senior Warden not found");
@@ -135,12 +146,5 @@ exports.getAllRequestsByStudentId = async (studentId) => {
   const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash");
   if (!assistantWarden) throw new Error("Assistant Warden not found");
 
-  return { requests, seniorWarden, assistantWarden };
-};
-
-// get request by ID
-exports.getRequestById = async (requestId) => {
-  const requests = await request.findOne({ request_id: requestId });
-  if (!requests) throw new Error("Request not found");
-  return requests;
+  return {requests, seniorWarden, assistantWarden};
 };
