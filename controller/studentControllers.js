@@ -147,7 +147,8 @@ exports.getAllRequestsByStudentId = async (req, res) => {
       message: "All requests retrieved successfully",
       requests,
       seniorWarden,
-      assistantWarden
+      assistantWarden,
+      studentId
     }));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));

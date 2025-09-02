@@ -4,7 +4,7 @@ const { generatePassword, hashPassword, comparePassword } = require("../utils/pa
 const { generateToken } = require("../utils/jwtUtils");
 
 const loginWarden = async (emp_id, wardenType, password) => {
-  const warden = await Warden.findOne({ emp_id, role: wardenType });
+  const warden = await Warden.findOne({ emp_id, role: wardenType }).select("-password_hash");
   if (!warden) throw new Error(`${wardenType} not found`);
 
   const isMatch = await comparePassword(password, warden.password_hash);

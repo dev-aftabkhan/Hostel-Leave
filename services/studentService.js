@@ -9,7 +9,7 @@ const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
 exports.loginStudent = async (enrollment_no, password, fcm_token) => {
-  const student = await Student.findOne({ enrollment_no });
+  const student = await Student.findOne({ enrollment_no }).select("-password_hash");
   if (!student) throw new Error("Invalid enrollment number or password");
 
   const isMatch = await comparePassword(password, student.password_hash);
@@ -49,7 +49,7 @@ exports.updateStudentProfile = async (studentId, updates) => {
     { student_id: studentId },        // match by student_id
     { $set: filteredUpdates },
     { new: true }
-  );
+  ).select("-password_hash");
 
   if (!student) throw new Error("Student not found");
   return student;
@@ -98,9 +98,9 @@ exports.getAllBranches = async () => {
 
 // get student by ID
 exports.getStudentById = async (studentId) => {
-  const student = await Student.findOne({ student_id: studentId });
+  const student = await Student.findOne({ student_id: studentId }).select("-password_hash");
   // parents-info
-  const parentsInfo = await Parent.find({ student_enrollment_no: student.enrollment_no });
+  const parentsInfo = await Parent.find({ student_enrollment_no: student.enrollment_no }).select("-password_hash");
   if (!student) throw new Error("Student not found");
   return { student, parentsInfo };
 };
@@ -123,17 +123,16 @@ exports.createRequest = async (requestData) => {
 
 // get all requests by id
 exports.getAllRequestsByStudentId = async (studentId) => {
-  console.log("Fetching requests for student ID:", studentId);
   const student = studentId.student;
   // get by latest first
-  const requests = await request.find({ student_id: student.student_enrollment_number }).sort({ created_at: -1 });
+  const requests = await request.find({ student_id: student.student_enrollment_number }).sort({ created_at: -1 }).select("-password_hash");
   if (!requests) throw new Error("No requests found for this student");
   // get senior_warden
-  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" });
+  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash");
   if (!seniorWarden) throw new Error("Senior Warden not found");
 
   // get assistant_warden
-  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" });
+  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash");
   if (!assistantWarden) throw new Error("Assistant Warden not found");
 
   return { requests, seniorWarden, assistantWarden };
