@@ -30,6 +30,9 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
   if (student) {
     userRole = "student";
     if (status === "cancelled_by_student") {
+      request.student_action = { action_by: student };
+      request.student_action = { action: status };
+      request.student_action.createdAt = new Date();
       request.request_status = "cancelled_by_student";
       request.active = false;
     } else {
@@ -43,10 +46,11 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
     if (parent) {
       userRole = "parent";
       if (request.request_status === "referred_to_parent") {
-        request.parent_action = { action_by: userID };
+        request.parent_action = { action_by: parent };
         if (status === "accepted_by_parent" || status === "rejected_by_parent") {
           request.parent_action.action = status;
         }
+        request.parent_action.createdAt = new Date();
         request.request_status =
           status === "accepted_by_parent" ? "accepted_by_parent" : "rejected_by_parent";
         if (remark) request.parent_remark = remark;
@@ -61,11 +65,12 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
       if (seniorWarden) {
         userRole = "senior_warden";
         if (request.request_status === "accepted_by_parent") {
-          request.senior_warden_action = { action_by: userID };
+          request.senior_warden_action = { action_by: seniorWarden };
           //set action
           if (status === "accepted_by_warden" || status === "rejected_by_warden") {
             request.senior_warden_action.action = status;
           }
+          request.senior_warden_action.createdAt = new Date();
           request.request_status =
             status === "accepted_by_warden" ? "accepted_by_warden" : "rejected_by_warden";
         } else {
@@ -79,11 +84,12 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
         if (assistantWarden) {
           userRole = "assistant_warden";
           if (request.request_status === "requested") {
-            request.assistent_warden_action = { action_by: userID };
+            request.assistent_warden_action = { action_by: assistantWarden };
             // If referring to parent, set the action
             if (status === "referred_to_parent" || status === "cancelled_assistent_warden") {
               request.assistent_warden_action.action = status;
             }
+            request.assistent_warden_action.createdAt = new Date();
             request.request_status =
               status === "referred_to_parent" ? "referred_to_parent" : "cancelled_assistent_warden";
           } else {

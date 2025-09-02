@@ -3,6 +3,7 @@ const Parent = require("../models/parent");
 const Hostel = require("../models/hostel");
 const Branch = require("../models/branch");
 const request = require("../models/request"); 
+const Warden = require("../models/warden");
 const mongoose = require("mongoose"); 
 const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
@@ -122,9 +123,20 @@ exports.createRequest = async (requestData) => {
 
 // get all requests by id
 exports.getAllRequestsByStudentId = async (studentId) => {
+  console.log("Fetching requests for student ID:", studentId);
+  const student = studentId.student;
   // get by latest first
-  const requests = await request.find({ student_id: studentId }).sort({ created_at: -1 });
-  return requests;
+  const requests = await request.find({ student_id: student.student_enrollment_number }).sort({ created_at: -1 });
+  if (!requests) throw new Error("No requests found for this student");
+  // get senior_warden
+  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" });
+  if (!seniorWarden) throw new Error("Senior Warden not found");
+
+  // get assistant_warden
+  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" });
+  if (!assistantWarden) throw new Error("Assistant Warden not found");
+
+  return { requests, seniorWarden, assistantWarden };
 };
 
 // get request by ID

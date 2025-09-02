@@ -27,19 +27,28 @@ const requestSchema = new mongoose.Schema({
 
   parent_action: {
     action_by: { type: String, ref: "Parent" },
-    action: { type: String, enum: ["accepted_by_parent", "rejected_by_parent"] }
+    action: { type: String, enum: ["accepted_by_parent", "rejected_by_parent"] },
+    createdAt: { type: Date }
   },
   assistent_warden_action: {
     action_by: { type: String, ref: "assistent_Warden" },
-    action: { type: String, enum: ["cancelled_assistent_warden", "referred_to_parent"] }
+    action: { type: String, enum: ["cancelled_assistent_warden", "referred_to_parent"] },
+    createdAt: { type: Date }
   },
   senior_warden_action: {
     action_by: { type: String, ref: "Senior_Warden" },
-    action: { type: String, enum: ["accepted_by_warden", "rejected_by_warden"] }
+    action: { type: String, enum: ["accepted_by_warden", "rejected_by_warden"] },
+    createdAt: { type: Date }
   },
   security_guard_action: {
     action_by: { type: String, ref: "Security_Guard" },
-    action: { type: String, enum: ["in", "out", "pending", "expired"] }
+    action: { type: String, enum: ["in", "out", "pending", "expired"] },
+    createdAt: { type: Date }
+  },
+  student_action: {
+    action_by: { type: String, ref: "Student" },
+    action: { type: String, enum: ["cancelled_by_student"] },
+    createdAt: { type: Date }
   },
   parent_remark: { type: String },
   created_by: { type: String, ref: "user" },

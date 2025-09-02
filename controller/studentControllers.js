@@ -140,12 +140,14 @@ exports.createRequest = async (req, res) => {
 // get all requests by student ID
 exports.getAllRequestsByStudentId = async (req, res) => {
   try {
-    const studentId = req.user.student_enrollment_number;
-    const requests = await studentService.getAllRequestsByStudentId(studentId);
+    const studentId = await studentService.getStudentById(req.user.student_id);
+    const { requests, seniorWarden, assistantWarden } = await studentService.getAllRequestsByStudentId(studentId);
 
     res.status(200).json(encryptData({
       message: "All requests retrieved successfully",
-      requests
+      requests,
+      seniorWarden,
+      assistantWarden
     }));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));
