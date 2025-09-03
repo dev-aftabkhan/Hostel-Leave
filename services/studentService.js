@@ -9,8 +9,10 @@ const {comparePassword} = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
 exports.loginStudent = async (enrollment_no, password, fcm_token) => {
-  const student = await Student.findOne({ enrollment_no }).select("-password_hash");
+  const student = await Student.findOne({ enrollment_no });
   if (!student) throw new Error("Invalid enrollment number or password");
+  // convert password_hash into password
+  const password = student.password_hash;
 
   const isMatch = await comparePassword(password, student.password_hash);
   if (!isMatch) throw new Error("Invalid enrollment number or password");
