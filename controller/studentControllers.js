@@ -107,7 +107,7 @@ exports.getAllBranches = async (req, res) => {
 // get student by ID
 exports.getStudentById = async (req, res) => {
   try {
-    const studentId = req.user.student_id;
+    const studentId = req.user.id;
     console.log("Authenticated Student ID:", studentId);
     const student = await studentService.getStudentById(studentId);
 
