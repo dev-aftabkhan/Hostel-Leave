@@ -140,7 +140,7 @@ exports.createRequest = async (req, res) => {
 // get all requests by student ID
 exports.getAllRequestsByStudentId = async (req, res) => {
   try {
-    const studentId = await studentService.getStudentById(req.user.student_id);
+    const studentId = await studentService.getStudentById(req.user.id);
     const requests = await studentService.getAllRequestsByStudentId(studentId);
 
     res.status(200).json(encryptData({
@@ -156,7 +156,7 @@ exports.getAllRequestsByStudentId = async (req, res) => {
 exports.getRequestById = async (req, res) => {
   try {
     const requestId = req.params.id;
-    const studentId = await studentService.getStudentById(req.user.student_id);
+    const studentId = await studentService.getStudentById(req.user.id);
     const { requests, seniorWarden, assistantWarden } = await studentService.getRequestById(requestId, studentId);
 
     res.status(200).json(encryptData({
