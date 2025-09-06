@@ -64,7 +64,7 @@ exports.updateProfile = async (req, res) => {
 // hostel-info
 exports.getHostelInfo = async (req, res) => {
   try {
-    const studentId = req.user.student_id;
+    const studentId = req.user.id;
     const hostelInfo = await studentService.getHostelInfoByStudent(studentId);
 
     res.status(200).json(encryptData({
@@ -125,7 +125,13 @@ exports.createRequest = async (req, res) => {
   try {
     const requestData = decryptData(req.body.encrypted);
     const student_enrollment_number = req.user.enrollment_no;
-    const created_by = req.user.student_id;
+    const created_by = req.user.id;
+    const user = await studentService.getStudentById(req.user.id);
+    const hostelInfo = await studentService.getHostelInfoByStudent(user);
+
+    //check the students hostel allow outing/leave or not
+    if(hostelInfo.outing_allowed === !true) throw new Error("outing is not allowed ");
+     
     const newRequest = await studentService.createRequest({ ...requestData, student_enrollment_number, created_by });
 
     res.status(201).json(encryptData({

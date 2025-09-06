@@ -37,9 +37,17 @@ const getAllActiveRequestsByHostelId = async (hostelId, status) => {
   return activeRequests;
 };
 
+// get waden by id
+const getWardenById = async (wardenId) => {
+  const warden = await Warden.findOne({ warden_id: wardenId }).select("-password_hash");
+  if (!warden) throw new Error("Warden not found");
+  return warden;
+};
+
 module.exports = {
   loginWarden,
-  getAllActiveRequestsByHostelId
+  getAllActiveRequestsByHostelId,
+  getWardenById
 };
 
  

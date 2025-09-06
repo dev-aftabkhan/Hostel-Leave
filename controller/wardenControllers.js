@@ -45,3 +45,18 @@ exports.getAllActiveRequestsByHostelId = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// ✅ Get warden profile
+exports.getWardenProfile = async (req, res) => {
+  try {
+    const wardenId = req.user.id;
+    const profile = await wardenService.getWardenById(wardenId);
+
+     res.status(200).json(encryptData({
+      message: "profile fetched successfully",
+      profile
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
