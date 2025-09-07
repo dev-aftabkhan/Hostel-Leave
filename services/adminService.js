@@ -205,4 +205,5 @@ const resetPasswordById = async (user_id, oldPassword, newPassword) => {
   return { message: "Password reset successfully" };
 };
 
+
 module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById };

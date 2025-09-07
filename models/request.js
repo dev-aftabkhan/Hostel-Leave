@@ -40,11 +40,11 @@ const requestSchema = new mongoose.Schema({
     action: { type: String, enum: ["accepted_by_warden", "rejected_by_warden"] },
     createdAt: { type: Date }
   },
-  security_guard_action: {
+  security_guard_action: [{
     action_by: { type: JSON, ref: "Security_Guard" },
     action: { type: String, enum: ["in", "out"] },
     createdAt: { type: Date }
-  },
+  }],
   student_action: {
     action_by: { type: JSON, ref: "Student" },
     action: { type: String, enum: ["cancelled_by_student"] },
