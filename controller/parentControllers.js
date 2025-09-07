@@ -41,7 +41,20 @@ const getParentById = async (req, res) => {
   }
 };
 
+// get all requests for parent by student enrollment number
+const getAllRequestsByStudentEnrollmentNo = async (req, res) => {
+  try {
+     
+    const studentEnrollmentNo = req.user.student_enrollment_no;
+    const requests = await parentService.getAllRequestsByStudentEnrollmentNo(studentEnrollmentNo);
+    res.json(requests);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginParent,
   getParentById,
+  getAllRequestsByStudentEnrollmentNo,
 };
