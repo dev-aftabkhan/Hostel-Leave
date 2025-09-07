@@ -2,6 +2,7 @@ const Student = require("../models/student");
 const Parent = require("../models/parent");
 const Warden = require("../models/warden");
 const Request = require("../models/request");
+const Security = require("../models/security");
 
 exports.updateRequestStatus = async (requestId, userID, status, remark) => {
   const validStatuses = [
@@ -96,6 +97,36 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
             message = "Request is not in requested state";
           }
         }
+
+        // 🔹 security guard action
+        else {
+          const securityGuard = await Security.findOne({ security_guard_id: userID });
+          if (securityGuard) {
+            userRole = "security_guard";
+            if (request.request_status === "accepted_by_warden" && request.security_status === "pending") {
+             
+              //set action
+              if (status === "out") {
+                request.security_guard_action.action = status;
+                request.security_guard_action = { action_by: securityGuard };
+              
+              request.security_guard_action.createdAt = new Date();
+              request.security_status =
+                status === "in" ? "in" : "out";}
+            } else if(request.security_status === "out"  && request.request_status === "accepted_by_warden") {
+               //set action
+              if (status === "in") {
+                request.security_guard_action.action = status;
+                request.security_guard_action = { action_by: securityGuard };
+              
+              request.security_guard_action.createdAt = new Date();
+              request.security_status =
+                status === "in" ? "in" : "out";
+              request.active = false;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -111,3 +142,5 @@ exports.getRequestsByStatus = async (status) => {
   const requests = await Request.find({ request_status: status }).sort({ created_at: -1 });
   return requests;
 };
+
+// update status of list of requests  
