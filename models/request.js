@@ -19,12 +19,10 @@ const requestSchema = new mongoose.Schema({
       "rejected_by_parent",
       "accepted_by_warden",
       "rejected_by_warden",
-      "in",
-      "out"
     ],
     default: "requested"
   },
-  security_status: { type: String, enum: ["in", "out", "pending", "expired"], default: "pending" },
+  security_status: { type: String, enum: ["in", "out", "pending"], default: "pending" },
   active: { type: Boolean, default: true },
   last_updated_at: { type: Date, default: Date.now },
 
