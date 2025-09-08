@@ -8,6 +8,7 @@ const wardenRoutes = require("./routes/wardenRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const requestRoutes = require("./routes/requestRoutes");
 const parentRoutes = require("./routes/parentRoutes");
+const securityGateRoutes = require("./routes/securityGateRoutes");
 
 
 dotenv.config();
@@ -25,5 +26,6 @@ app.use("/api/warden", wardenRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/request", requestRoutes);
 app.use("/api/parent", parentRoutes);
+app.use("/api/security", securityGateRoutes);
 
 module.exports = app;
