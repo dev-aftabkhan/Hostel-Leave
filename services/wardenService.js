@@ -32,12 +32,12 @@ const getAllActiveRequestsByHostelId = async (hostelId, status) => {
     student_enrollment_number: { $in: studentIds },
     active: true,
     request_status: { $in: status }
-  }).populate("student_action.action_by", "name enrollment_no").populate("parent_action.action_by", "name").populate("assistent_warden_action.action_by", "name emp_id").populate("senior_warden_action.action_by", "name emp_id").populate("security_guard_action.action_by", "name emp_id");
+  }).sort({ created_at: -1 });
    if (!activeRequests || activeRequests.length === 0) throw new Error("No active requests found for this hostel");
   return activeRequests;
 };
 
-// get waden by id
+// get warden by id
 const getWardenById = async (wardenId) => {
   const warden = await Warden.findOne({ warden_id: wardenId }).select("-password_hash");
   if (!warden) throw new Error("Warden not found");
