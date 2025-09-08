@@ -12,5 +12,6 @@ router.post("/create-student", authMiddleware, admincontroller.createStudent);
 router.post("/login/admin", admincontroller.adminLogin);
 router.post("/create-branch", authMiddleware, admincontroller.createBranch);
 router.put("/reset-password", authMiddleware, admincontroller.resetPassword);
+router.post("/create-security-guard", authMiddleware, admincontroller.createSecurityGuard);
 
 module.exports = router;

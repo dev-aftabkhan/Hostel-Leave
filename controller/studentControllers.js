@@ -125,9 +125,13 @@ exports.createRequest = async (req, res) => {
   try {
     const requestData = decryptData(req.body.encrypted);
     const student_enrollment_number = req.user.enrollment_no;
+     
     const created_by = req.user.id;
+    
     const user = await studentService.getStudentById(req.user.id);
-    const hostelInfo = await studentService.getHostelInfoByStudent(user);
+     
+    const hostelInfo = await studentService.getHostelInfoByStudent(user.student.student_id);
+    
 
     //check the students hostel allow outing/leave or not
     if(hostelInfo.outing_allowed === !true) throw new Error("outing is not allowed ");

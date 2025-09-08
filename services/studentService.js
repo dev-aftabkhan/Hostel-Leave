@@ -109,13 +109,14 @@ exports.getStudentById = async (studentId) => {
 // create request with proper validation
 exports.createRequest = async (requestData) => {
   const { request_type, student_enrollment_number, applied_from, applied_to, reason, created_by } = requestData;
-
+ 
   // Validate required fields
   if (!request_type || !student_enrollment_number || !applied_from || !applied_to || !reason || !created_by) {
     throw new Error("All fields are required");
   }
   // request_id is generated automatically
   requestData.request_id =  new mongoose.Types.ObjectId().toString();
+   
   // Create and save the request
   const newRequest = new request(requestData);
   await newRequest.save();

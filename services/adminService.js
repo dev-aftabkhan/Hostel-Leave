@@ -4,6 +4,7 @@ const Hostel = require("../models/hostel");
 const Student = require("../models/student");
 const Parent  = require("../models/parent");
 const Branch = require("../models/branch");
+const SecurityGuard = require("../models/security");
 const { v4: uuidv4 } = require("uuid");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
@@ -205,5 +206,30 @@ const resetPasswordById = async (user_id, oldPassword, newPassword) => {
   return { message: "Password reset successfully" };
 };
 
+// create security guard
+const createSecurityGuard = async (data) => {
+  const { name, phone_no, email, emp_id, created_by } = data;
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById };
+  const existingGuard = await SecurityGuard.findOne({ emp_id });
+  if (existingGuard) throw new Error("Security guard with this employee ID already exists");
+
+  // generate password
+  const plainPassword = generatePassword(10);
+  const password_hash = await hashPassword(plainPassword);
+
+  const security_guard_id = "SEC_" + uuidv4().slice(0, 8);
+  const newGuard = new SecurityGuard({
+    security_guard_id,
+    name,
+    phone_no,
+    email,
+    emp_id,
+    password_hash,
+    created_by
+  });
+
+  await newGuard.save();
+  return {newGuard, plainPassword};
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard };

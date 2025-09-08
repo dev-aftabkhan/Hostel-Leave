@@ -198,3 +198,30 @@ exports.resetPassword = async (req, res) => {
     res.status(400).json(encryptData({ error: err.message }));
   }
 };
+
+// ✅ Create Security Guard
+exports.createSecurityGuard = async (req, res) => {
+  try {
+    const decryptedBody = decryptData(req.body.encrypted);
+    const { name, phone_no, email, emp_id } = decryptedBody;
+    const created_by = req.user.id; // from auth middleware
+
+    const {newGuard, plainPassword} = await adminService.createSecurityGuard({
+      name,
+      phone_no,
+      email,
+      emp_id,
+      created_by
+    });
+     
+
+    // 🔐 encrypt response
+    res.status(201).json(encryptData({
+      message: "Security guard created successfully",
+      securityGuard: newGuard,
+      password: plainPassword
+    }));
+  } catch (err) {
+    res.status(400).json(encryptData({ error: err.message }));
+  }
+};
