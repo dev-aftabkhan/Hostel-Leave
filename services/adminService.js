@@ -233,3 +233,6 @@ const createSecurityGuard = async (data) => {
 };
 
 module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard };
+
+
+// optional checks
