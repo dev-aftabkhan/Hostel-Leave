@@ -19,11 +19,13 @@ exports.loginSecurityGuard = async (req, res) => {
   }
 };
 
-// get all requests for security gate by status
+// get all requests for security gate by status with security status  parameter
 exports.getAllRequestsByStatus = async (req, res) => {
   try {
     const status = "accepted_by_warden";
-    const requests = await SecurityGateService.getActiveRequestsByStatus(status);
+    const { security_status } = req.params;  // <-- FIX
+
+    const requests = await SecurityGateService.getActiveRequestsByStatus(status, security_status);
     res.status(200).json(encryptData(requests));
   } catch (err) {
     res.status(400).json(encryptData({ error: err.message }));

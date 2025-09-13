@@ -23,9 +23,10 @@ const loginSecurityGuard = async (emp_id, password) => {
   return { token };
 };
 
-//get all active requests for security guard  by status
-const getActiveRequestsByStatus = async (status) => {
-  const requests = await Request.find({ request_status: status }).sort({ created_at: -1 });
+//get all active requests for security guard  by status and  security status
+
+const getActiveRequestsByStatus = async (status, security_status) => {
+  const requests = await Request.find({ request_status: status, security_status }).sort({ created_at: -1 });
     return requests;
 };
 
