@@ -1,21 +1,21 @@
 const SecurityGateService = require("../services/Security-gateService");
-const { decryptData, encryptData } = require("../utils/cryptoUtils");
+ 
 
 // Security Guard Login
 exports.loginSecurityGuard = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
      
     const { emp_id, password } = decryptedBody;
 
     const { token } = await SecurityGateService.loginSecurityGuard(emp_id, password);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Security Guard login successful",
       token,
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json( { error: err.message });
   }
 };
 
@@ -26,8 +26,8 @@ exports.getAllRequestsByStatus = async (req, res) => {
     const { security_status } = req.params;  // <-- FIX
 
     const requests = await SecurityGateService.getActiveRequestsByStatus(status, security_status);
-    res.status(200).json(encryptData(requests));
+    res.status(200).json (requests);
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };

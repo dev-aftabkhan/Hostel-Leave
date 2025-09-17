@@ -44,10 +44,11 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
   // 🔹 Parent action
   else {
     const parent = await Parent.findOne({ parent_id: userID });
+    console.log(parent);
     if (parent) {
       userRole = "parent";
       if (request.request_status === "referred_to_parent") {
-        request.parent_action = { action_by: parent };
+        request.parent_action = { action_by: parent.toObject() };
         if (status === "accepted_by_parent" || status === "rejected_by_parent") {
           request.parent_action.action = status;
         }

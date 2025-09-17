@@ -82,17 +82,17 @@ exports.createHostel = async (req, res) => {
 // Admin Login
 exports.adminLogin = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { emp_id, password } = decryptedBody;
 
     const { token } = await adminService.loginAdmin(emp_id, password);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Admin login successful",
       token
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
