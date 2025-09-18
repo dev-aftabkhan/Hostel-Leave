@@ -6,17 +6,17 @@ const { encryptData, decryptData } = require("../utils/cryptoUtils");
 // ✅ Warden Login
 exports.wardenLogin = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { emp_id, wardenType, password } = decryptedBody;
 
     const { token } = await wardenService.loginWarden(emp_id, wardenType, password);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: `${wardenType} login successful`,
       token
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -37,12 +37,12 @@ exports.getAllActiveRequestsByHostelId = async (req, res) => {
 
     const requests = await wardenService.getAllActiveRequestsByHostelId(user.hostel_id, status);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Active requests fetched successfully",
       requests
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -52,11 +52,11 @@ exports.getWardenProfile = async (req, res) => {
     const wardenId = req.user.id;
     const profile = await wardenService.getWardenById(wardenId);
 
-     res.status(200).json(encryptData({
+     res.status(200).json({
       message: "profile fetched successfully",
       profile
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };

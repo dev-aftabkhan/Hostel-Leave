@@ -5,7 +5,7 @@ const { encryptData, decryptData } = require("../utils/cryptoUtils");
 exports.createWarden = async (req, res) => {
   try {
     // 🔓 decrypt incoming body
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { wardenType, name, emp_id, hostel_id, phone_no, email } = decryptedBody;
     const created_by = req.user.admin_id; // from auth middleware
     const { warden, plainPassword } = await adminService.createWarden(wardenType, {
@@ -18,13 +18,13 @@ exports.createWarden = async (req, res) => {
     });
 
     // 🔐 encrypt response
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: `${wardenType} created successfully`,
       emp_id: warden.emp_id,
       generated_password: plainPassword
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -32,7 +32,7 @@ exports.createWarden = async (req, res) => {
 exports.createAdmin = async (req, res) => {
   try {
     // 🔓 decrypt incoming body
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { name, email, emp_id, phone_no } = decryptedBody;
     const created_by = req.user.admin_id; // from auth middleware
     const { admin, plainPassword } = await adminService.createAdmin({
@@ -44,13 +44,13 @@ exports.createAdmin = async (req, res) => {
     });
 
     // 🔐 encrypt response
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Admin created successfully",
       emp_id: admin.emp_id,
       generated_password: plainPassword
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -58,7 +58,7 @@ exports.createAdmin = async (req, res) => {
 exports.createHostel = async (req, res) => {
   try {
     // 🔓 decrypt incoming body
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { hostel_name, check_out_start_time, latest_return_time, outing_allowed } = decryptedBody;
     const created_by = req.user.admin_id; // from auth middleware
     const hostel = await adminService.createHostel({
@@ -70,12 +70,12 @@ exports.createHostel = async (req, res) => {
     });
 
     // 🔐 encrypt response
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Hostel created successfully",
       hostel
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -98,7 +98,7 @@ exports.adminLogin = async (req, res) => {
 
 exports.createStudent = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
 
     const {
       enrollment_no,
@@ -147,14 +147,14 @@ exports.createStudent = async (req, res) => {
 
     const { student, parents, password } = await adminService.createStudentWithParents(studentData, parentsData, created_by);
 
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Student and parents created successfully",
       student,
       parents,
       password
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -162,7 +162,7 @@ exports.createStudent = async (req, res) => {
 exports.createBranch = async (req, res) => {
   try {
     // 🔓 decrypt incoming body
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { branch_name, max_semester } = decryptedBody;
     const created_by = req.user.id; // from auth middleware
 
@@ -173,36 +173,36 @@ exports.createBranch = async (req, res) => {
     });
 
     // 🔐 encrypt response
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Branch created successfully",
       branch
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
 // reset password
 exports.resetPassword = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { oldPassword, newPassword } = decryptedBody;
     const user_id = req.user.id; // from auth middleware
 
     const result = await adminService.resetPasswordById(user_id, oldPassword, newPassword);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: result.message
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
 // ✅ Create Security Guard
 exports.createSecurityGuard = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { name, phone_no, email, emp_id } = decryptedBody;
     const created_by = req.user.id; // from auth middleware
 
@@ -216,12 +216,12 @@ exports.createSecurityGuard = async (req, res) => {
      
 
     // 🔐 encrypt response
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Security guard created successfully",
       securityGuard: newGuard,
       password: plainPassword
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };

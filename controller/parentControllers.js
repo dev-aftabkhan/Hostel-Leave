@@ -6,7 +6,7 @@ const { decryptData, encryptData } = require("../utils/cryptoUtils");
 // login parent
 const loginParent = async (req, res) => {
   try {
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { phone_no, student_enrollment_no } = decryptedBody;
      
     // check if phone_no is registered

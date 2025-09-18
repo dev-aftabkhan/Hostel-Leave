@@ -4,7 +4,7 @@ const  requestController = require("../services/requestService");
 exports.updateRequestStatus = async (req, res) => {
   try {
     // 🔓 decrypt incoming request
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { requestId, status, remark } = decryptedBody;
 
     // 👤 User comes from JWT authMiddleware
@@ -18,14 +18,14 @@ exports.updateRequestStatus = async (req, res) => {
     );
 
     res.status(200).json({
-      encrypted: encryptData({
+       
         message: message || "Request status updated successfully",
         request_status: updatedRequest.request_status
-      })
+       
     });
     
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 // request by status
@@ -36,9 +36,9 @@ exports.getRequestsByStatus = async (req, res) => {
     const requests = await requestController.getRequestsByStatus(status);
 
     res.status(200).json({
-      encrypted: encryptData(requests)
+      encrypted:  requests
     });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };

@@ -5,21 +5,21 @@ const { encryptData, decryptData } = require("../utils/cryptoUtils");
 exports.loginStudent = async (req, res) => {
   try {
     // 🔓 Decrypt body
-    const decryptedBody = decryptData(req.body.encrypted);
+    const decryptedBody = req.body;
     const { enrollment_no, password, fcm_token } = decryptedBody;
 
     const { token, student } = await studentService.loginStudent(enrollment_no, password, fcm_token);
 
     // 🔐 Encrypt response
-    res.status(200).json(encryptData({
+    res.status(200).json( {
       message: "Login successful",
       enrollment_no: student.enrollment_no,
       name: student.name,
       profile_pic: student.profile_pic,
       token
-    }));
+    });
   } catch (err) {
-    res.status(401).json(encryptData({ error: err.message }));
+    res.status(401).json({ error: err.message });
   }
 };
 
@@ -29,8 +29,8 @@ exports.updateProfile = async (req, res) => {
     let updates = {};
 
     // 🔓 decrypt body if exists (for hostel_id, room_no, semester, branch)
-    if (req.body.encrypted) {
-      updates = decryptData(req.body.encrypted);
+    if (req.body) {
+      updates = req.body;
     }
 
     // ✅ If profile_pic uploaded
@@ -45,7 +45,7 @@ exports.updateProfile = async (req, res) => {
 
     const updatedStudent = await studentService.updateStudentProfile(studentId, updates);
 
-    res.status(200).json(encryptData({
+    res.status(200).json( {
       message: "Profile updated successfully",
       student: {
         enrollment_no: updatedStudent.enrollment_no,
@@ -55,9 +55,9 @@ exports.updateProfile = async (req, res) => {
         semester: updatedStudent.semester,
         branch: updatedStudent.branch
       }
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -67,12 +67,12 @@ exports.getHostelInfo = async (req, res) => {
     const studentId = req.user.id;
     const hostelInfo = await studentService.getHostelInfoByStudent(studentId);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Hostel information retrieved successfully",
       hostel: hostelInfo.hostel
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -81,12 +81,12 @@ exports.getAllHostelInfo = async (req, res) => {
   try {
     const hostels = await studentService.getAllHostelInfo();
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "All hostel information retrieved successfully",
       hostels
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -95,12 +95,12 @@ exports.getAllBranches = async (req, res) => {
   try {
     const branches = await studentService.getAllBranches();
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "All branch information retrieved successfully",
       branches
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -111,19 +111,19 @@ exports.getStudentById = async (req, res) => {
     console.log("Authenticated Student ID:", studentId);
     const student = await studentService.getStudentById(studentId);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Student information retrieved successfully",
       student
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
 // create request
 exports.createRequest = async (req, res) => {
   try {
-    const requestData = decryptData(req.body.encrypted);
+    const requestData = req.body;
     const student_enrollment_number = req.user.enrollment_no;
      
     const created_by = req.user.id;
@@ -138,12 +138,12 @@ exports.createRequest = async (req, res) => {
      
     const newRequest = await studentService.createRequest({ ...requestData, student_enrollment_number, created_by });
 
-    res.status(201).json(encryptData({
+    res.status(201).json({
       message: "Request created successfully",
       request: newRequest
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -153,12 +153,12 @@ exports.getAllRequestsByStudentId = async (req, res) => {
     const studentId = await studentService.getStudentById(req.user.id);
     const requests = await studentService.getAllRequestsByStudentId(studentId);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "All requests retrieved successfully",
       requests
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -169,14 +169,14 @@ exports.getRequestById = async (req, res) => {
     const studentId = await studentService.getStudentById(req.user.id);
     const { requests, seniorWarden, assistantWarden } = await studentService.getRequestById(requestId, studentId);
 
-    res.status(200).json(encryptData({
+    res.status(200).json({
       message: "Request retrieved successfully",
       request: requests,  // Assuming you want the first request
       seniorWarden,
       assistantWarden,
       studentId
-    }));
+    });
   } catch (err) {
-    res.status(400).json(encryptData({ error: err.message }));
+    res.status(400).json({ error: err.message });
   }
 };
