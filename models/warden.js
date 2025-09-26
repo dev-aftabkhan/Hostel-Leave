@@ -12,7 +12,7 @@ const WardenSchema = new mongoose.Schema({
   updated_by: { type: String },
   updated_at: { type: Date, default: Date.now },
   fcm_tokens: [{ type: String }],
-  hostel_id: { type: String, required: true },
+  hostel_id: [{ type: String, required: true }],
   language_preferences: { type: String },
   profile_pic: { type: String },
   role: { type: String, enum: ["senior_warden", "warden"], required: true }

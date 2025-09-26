@@ -41,7 +41,7 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Student ID will come from JWT auth
-    const studentId = req.user.student_id;
+    const studentId = req.user.id;
 
     const updatedStudent = await studentService.updateStudentProfile(studentId, updates);
 
