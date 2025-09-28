@@ -56,6 +56,9 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
         request.request_status =
           status === "accepted_by_parent" ? "accepted_by_parent" : "rejected_by_parent";
         if (remark) request.parent_remark = remark;
+        if (request.request_status === "rejected_by_parent") {
+          request.active = false;
+        }
       } else {
         message = "Request is not referred to parent yet";
       }
@@ -75,6 +78,9 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
           request.senior_warden_action.createdAt = new Date();
           request.request_status =
             status === "accepted_by_warden" ? "accepted_by_warden" : "rejected_by_warden";
+          if(request.request_status === "rejected_by_warden"){
+            request.active = false;
+          }
         } else {
           message = "Request is not accepted by parent yet";
         }
@@ -94,6 +100,9 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
             request.assistent_warden_action.createdAt = new Date();
             request.request_status =
               status === "referred_to_parent" ? "referred_to_parent" : "cancelled_assistent_warden";
+            if(request.request_status === "cancelled_assistent_warden"){
+              request.active = false;
+            }
           } else {
             message = "Request is not in requested state";
           }
@@ -144,4 +153,14 @@ exports.getRequestsByStatus = async (status) => {
   return requests;
 };
 
-// update status of list of requests  
+// get all inactive requests by student enrollment number
+exports.getAllInactiveRequestsByStudentEnrollmentNo = async (studentEnrollmentNo) => {
+  const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo, status: { $in: ["rejected", "completed"] } }).sort({ created_at: -1 });
+  return requests;
+}
+
+// get request by enrolement number and status
+exports.getRequestsByEnrollmentNoAndStatus = async (studentEnrollmentNo, status) => {
+  const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo, request_status: status }).sort({ created_at: -1 });
+  return requests;  
+}

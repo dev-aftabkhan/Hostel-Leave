@@ -47,7 +47,10 @@ const getAllRequestsByStudentEnrollmentNo = async (req, res) => {
      
     const studentEnrollmentNo = req.user.student_enrollment_no;
     const requests = await parentService.getAllRequestsByStudentEnrollmentNo(studentEnrollmentNo);
-    res.json(requests);
+    res.json({ 
+      message: "Requests retrieved successfully",
+      requests 
+    });
   } catch (error) {
     res.status(404).json({ error: error.message });
   }

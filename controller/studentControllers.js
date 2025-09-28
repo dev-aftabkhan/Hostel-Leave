@@ -182,30 +182,4 @@ exports.getRequestById = async (req, res) => {
   }
 };
 
-// get all inactive requests by student enrollment number
-exports.getAllInactiveRequestsByStudentEnrollmentNo = async (req, res) => {
-  try {
-    let enrollmentNo;
-
-    if (req.user.role === "student") {
-      const student = await studentService.getStudentById(req.user.id);
-      if (!student) throw new Error("Student not found");
-      enrollmentNo = student.student.enrollment_no;
-    } 
-    
-    else if (req.user.role === "parent") {
-      const parent = await Parent.findOne({ parent_id: req.user.id });
-      if (!parent) throw new Error("Parent not found");
-      enrollmentNo = parent.student_enrollment_no;
-    }
-
-    const requests = await studentService.getAllInactiveRequestsByStudentEnrollmentNo(enrollmentNo);
-
-    res.status(200).json({
-      message: "All inactive requests retrieved successfully",
-      requests
-    });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-};
+ 

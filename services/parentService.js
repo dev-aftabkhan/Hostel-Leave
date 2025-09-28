@@ -22,7 +22,7 @@ const getParentById = async (parentId) => {
 
 // get all request for parent by student enrollment number
 const getAllRequestsByStudentEnrollmentNo = async (studentEnrollmentNo) => {
-  const requests = await Request.findOne({ student_enrollment_number: studentEnrollmentNo }).sort({ created_at: -1 })
+  const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo }).sort({ created_at: -1 })
     .populate("student_action.action_by", "name enrollment_no")
     .populate("parent_action.action_by", "name");
   return requests;

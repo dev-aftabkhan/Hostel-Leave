@@ -151,8 +151,4 @@ exports.getRequestById = async (requestId, studentId) => {
   return {requests, seniorWarden, assistantWarden};
 };
 
-// get all inactive requests by student enrollment number
-exports.getAllInactiveRequestsByStudentEnrollmentNo = async (studentEnrollmentNo) => {
-  const requests = await request.find({ student_enrollment_number: studentEnrollmentNo, status: { $in: ["rejected", "completed"] } }).sort({ created_at: -1 });
-  return requests;
-}
+ 

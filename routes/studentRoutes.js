@@ -29,7 +29,5 @@ router.get("/requests", authMiddleware, studentControllers.getAllRequestsByStude
 // get request by ID
 router.get("/requests/:id", authMiddleware, studentControllers.getRequestById);
 
-// get all inactive requests by student ID
-router.get("/inactive-requests", authMiddleware, studentControllers.getAllInactiveRequestsByStudentEnrollmentNo);
-
+ 
 module.exports = router;
