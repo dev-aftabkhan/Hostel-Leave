@@ -1,5 +1,6 @@
 const Parent = require("../models/parent");
 const Request = require("../models/request");
+const Student = require("../models/student");
 const { generateToken } = require("../utils/jwtUtils");
 
 // login parent through phone number and student enrollment number
@@ -28,8 +29,21 @@ const getAllRequestsByStudentEnrollmentNo = async (studentEnrollmentNo) => {
   return requests;
 };
 
+// get student by student_enrollment_no
+const getStudentByEnrollmentNo = async (enrollmentNo) => {
+  if(Array.isArray(enrollmentNo)) {
+    const students = await Student.find({ enrollment_no: { $in: enrollmentNo } }).select("-password_hash");
+    if (!students || students.length === 0) throw new Error("Students not found");
+    return students;
+  } else {
+  const student = await Student.findOne({ enrollment_no: enrollmentNo }).select("-password_hash");
+  if (!student) throw new Error("Student not found");
+  return student;}
+};
+
 module.exports = {
   loginParent,
   getParentById,
   getAllRequestsByStudentEnrollmentNo,
+  getStudentByEnrollmentNo
 };

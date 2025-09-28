@@ -6,5 +6,6 @@ const parentController = require("../controller/parentControllers");
 router.post("/login", parentController.loginParent);
 router.get("/profile", authMiddleware, parentController.getParentById);
 router.get("/allRequests", authMiddleware, parentController.getAllRequestsByStudentEnrollmentNo);
+router.get("/student", authMiddleware, parentController.getStudentByEnrollmentNo);
 
 module.exports = router;

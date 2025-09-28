@@ -56,8 +56,23 @@ const getAllRequestsByStudentEnrollmentNo = async (req, res) => {
   }
 };
 
+// get student by student_enrollment_no
+const getStudentByEnrollmentNo = async (req, res) => {
+  try {
+    const parent = await Parent.findOne({ parent_id: req.user.id });
+    if (!parent) throw new Error("Parent not found");
+    const { enrollmentNo } = parent.student_enrollment_no.length > 0 ? { enrollmentNo: parent.student_enrollment_no } : {};
+    if (!enrollmentNo) throw new Error("No associated student enrollment number found");
+    const student = await parentService.getStudentByEnrollmentNo(enrollmentNo);
+    res.json(student);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginParent,
   getParentById,
   getAllRequestsByStudentEnrollmentNo,
+  getStudentByEnrollmentNo
 };
