@@ -9,7 +9,7 @@ const loginParent = async (phone_no, student_enrollment_no) => {
   if (!parent) throw new Error("Parent not found");
 
   // ✅ generate encrypted JWT
-  const token = generateToken({ id: parent.parent_id, role: "parent", phone_no: parent.phone_no, student_enrollment_no: student_enrollment_no });
+  const token = generateToken({ id: parent.parent_id, role: "parent", phone_no: parent.phone_no });
 
   return { token };
 };

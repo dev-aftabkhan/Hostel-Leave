@@ -44,8 +44,12 @@ const getParentById = async (req, res) => {
 // get all requests for parent by student enrollment number
 const getAllRequestsByStudentEnrollmentNo = async (req, res) => {
   try {
-     
-    const studentEnrollmentNo = req.user.student_enrollment_no;
+    const parent = await Parent.findOne({ parent_id: req.user.id });
+    if (!parent) throw new Error("Parent not found");
+    const studentEnrollmentNo = parent.student_enrollment_no;
+    if (!studentEnrollmentNo || studentEnrollmentNo.length === 0) {
+      throw new Error("No associated student enrollment number found");
+    }
     const requests = await parentService.getAllRequestsByStudentEnrollmentNo(studentEnrollmentNo);
     res.json({ 
       message: "Requests retrieved successfully",

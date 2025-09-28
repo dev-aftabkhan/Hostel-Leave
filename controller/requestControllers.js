@@ -108,3 +108,22 @@ exports.getRequestsByStudentEnrollmentNoAndStatus = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// get request by ID
+exports.getRequestById = async (req, res) => {
+  try {
+    const requestId = req.params.id;
+    const { requests, seniorWarden, assistantWarden } = await requestService.getRequestById(requestId);
+
+    res.status(200).json({
+      message: "Request retrieved successfully",
+      request: requests,  // Assuming you want the first request
+      seniorWarden,
+      assistantWarden
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+ 

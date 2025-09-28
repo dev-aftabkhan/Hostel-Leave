@@ -155,7 +155,7 @@ exports.getRequestsByStatus = async (status) => {
 
 // get all inactive requests by student enrollment number
 exports.getAllInactiveRequestsByStudentEnrollmentNo = async (studentEnrollmentNo) => {
-  const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo, status: { $in: ["rejected", "completed"] } }).sort({ created_at: -1 });
+  const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo, active: false }).sort({ created_at: -1 });
   return requests;
 }
 
@@ -164,3 +164,21 @@ exports.getRequestsByEnrollmentNoAndStatus = async (studentEnrollmentNo, status)
   const requests = await Request.find({ student_enrollment_number: studentEnrollmentNo, request_status: status }).sort({ created_at: -1 });
   return requests;  
 }
+
+// get request by ID
+exports.getRequestById = async (requestId) => {
+
+  const requests = await Request.findOne({ request_id: requestId });
+  const student = await Student.findOne({ enrollment_no: requests.student_enrollment_number });
+  if (!requests) throw new Error("Request not found");
+
+  // get senior_warden
+  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash");
+  if (!seniorWarden) throw new Error("Senior Warden not found");
+
+  // get assistant_warden
+  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash");
+  if (!assistantWarden) throw new Error("Assistant Warden not found");
+
+  return {requests, seniorWarden, assistantWarden};
+};

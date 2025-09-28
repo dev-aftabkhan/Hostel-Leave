@@ -133,22 +133,5 @@ exports.getAllRequestsByStudentId = async (studentId) => {
   return requests;
 };
 
-// get request by ID
-exports.getRequestById = async (requestId, studentId) => {
-
-  const student = studentId.student;
-  const requests = await request.findOne({ request_id: requestId });
-  if (!requests) throw new Error("Request not found");
-
-  // get senior_warden
-  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash");
-  if (!seniorWarden) throw new Error("Senior Warden not found");
-
-  // get assistant_warden
-  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash");
-  if (!assistantWarden) throw new Error("Assistant Warden not found");
-
-  return {requests, seniorWarden, assistantWarden};
-};
-
+ 
  

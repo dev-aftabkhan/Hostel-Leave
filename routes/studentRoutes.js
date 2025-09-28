@@ -26,8 +26,7 @@ router.post("/create-request", authMiddleware, studentControllers.createRequest)
 // get all requests by student ID
 router.get("/requests", authMiddleware, studentControllers.getAllRequestsByStudentId);
 
-// get request by ID
-router.get("/requests/:id", authMiddleware, studentControllers.getRequestById);
+ 
 
  
 module.exports = router;

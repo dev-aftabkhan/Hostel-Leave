@@ -71,7 +71,7 @@ const createAdmin = async (data) => {
 
 // ✅ Create Hostel
 const createHostel = async (data) => {
-  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, created_by } = data;
+  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, total_rooms, room_occupancy, created_by } = data;
 
   const existingHostel = await Hostel.findOne({ hostel_name });
   if (existingHostel) throw new Error("Hostel with this name already exists");
@@ -82,6 +82,8 @@ const createHostel = async (data) => {
     check_out_start_time,
     latest_return_time,
     outing_allowed,
+    total_rooms,
+    room_occupancy,
     created_by,
   });
 

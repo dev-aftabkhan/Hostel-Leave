@@ -8,4 +8,5 @@ router.put("/update-status", authMiddleware, requestController.updateRequestStat
 router.get("/ByStatus/:status", authMiddleware, requestController.getRequestsByStatus);
 router.get("/inactive-requests", authMiddleware, requestController.getAllInactiveRequestsByStudentEnrollmentNo);
 router.get("/requests/:status", authMiddleware, requestController.getRequestsByStudentEnrollmentNoAndStatus);
+router.get("/request/:id", authMiddleware, requestController.getRequestById);
 module.exports = router;

@@ -168,14 +168,13 @@ exports.getRequestById = async (req, res) => {
   try {
     const requestId = req.params.id;
     const studentId = await studentService.getStudentById(req.user.id);
-    const { requests, seniorWarden, assistantWarden } = await studentService.getRequestById(requestId, studentId);
+    const { requests, seniorWarden, assistantWarden } = await studentService.getRequestById(requestId);
 
     res.status(200).json({
       message: "Request retrieved successfully",
       request: requests,  // Assuming you want the first request
       seniorWarden,
-      assistantWarden,
-      studentId
+      assistantWarden
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
