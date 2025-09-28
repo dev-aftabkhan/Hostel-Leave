@@ -71,7 +71,7 @@ const createAdmin = async (data) => {
 
 // ✅ Create Hostel
 const createHostel = async (data) => {
-  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, total_rooms, room_occupancy, created_by } = data;
+  const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, room_occupancy, total_rooms, created_by } = data;
 
   const existingHostel = await Hostel.findOne({ hostel_name });
   if (existingHostel) throw new Error("Hostel with this name already exists");
@@ -89,6 +89,25 @@ const createHostel = async (data) => {
 
   await newHostel.save();
   return newHostel;
+};
+
+// update hostel
+const updateHostel = async (hostel_id, data) => {
+  const hostel = await Hostel.findOne({ hostel_id });
+  if (!hostel) throw new Error("Hostel not found");
+
+  Object.assign(hostel, data);
+  await hostel.save();
+  return hostel;
+};
+
+// inactive hostel
+const inactiveHostel = async (hostel_id) => {
+  const hostel = await Hostel.findOne({ hostel_id });
+  if (!hostel) throw new Error("Hostel not found");  
+  hostel.active = false;
+  await hostel.save();
+  return hostel;
 };
 
 // login admin
@@ -234,7 +253,7 @@ const createSecurityGuard = async (data) => {
   return {newGuard, plainPassword};
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard };
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel };
 
 
 // optional checks

@@ -1,5 +1,6 @@
 const adminService = require("../services/adminService");
-const { encryptData, decryptData } = require("../utils/cryptoUtils");
+const Student = require("../models/student");
+const Hostel = require("../models/hostel");
 
 // ✅ Create Warden
 exports.createWarden = async (req, res) => {
@@ -59,19 +60,52 @@ exports.createHostel = async (req, res) => {
   try {
     // 🔓 decrypt incoming body
     const decryptedBody = req.body;
-    const { hostel_name, check_out_start_time, latest_return_time, outing_allowed } = decryptedBody;
-    const created_by = req.user.admin_id; // from auth middleware
+    const { hostel_name, check_out_start_time, latest_return_time, outing_allowed, room_occupancy, total_rooms } = decryptedBody;
+    const created_by = req.user.id; // from auth middleware
     const hostel = await adminService.createHostel({
       hostel_name,
       check_out_start_time,
       latest_return_time,
       outing_allowed,
+      room_occupancy,
+      total_rooms,
       created_by
     });
 
     // 🔐 encrypt response
     res.status(201).json({
       message: "Hostel created successfully",
+      hostel
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// ✅ Update Hostel
+exports.updateHostel = async (req, res) => {
+  try {
+    const { hostel_id } = req.params;
+    const updatedData = req.body;
+    const hostel = await adminService.updateHostel(hostel_id, updatedData);
+
+    res.status(200).json({
+      message: "Hostel updated successfully",
+      hostel
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// inactive Hostel
+exports.inactiveHostel = async (req, res) => {
+  try {
+    const { hostel_id } = req.params;
+    const hostel = await adminService.inactiveHostel(hostel_id);
+
+    res.status(200).json({
+      message: "Hostel deactivated successfully",
       hostel
     });
   } catch (err) {
@@ -144,6 +178,27 @@ exports.createStudent = async (req, res) => {
       });
     }
     const created_by = req.user.id; // from auth middleware
+
+    //check if the allocated room is available for that hostel as it should not exceed the room_occupancy of the hostel
+    const hostel = await adminService.getHostelById(hostel_id);
+    if (!hostel) {
+      return res.status(404).json({ error: "Hostel not found" });
+    }
+
+    // check if the room_no is valid for that hostel
+    if (room_no < 1 || room_no > hostel.total_rooms) {
+      return res.status(400).json({ error: `Invalid room number for ${hostel.hostel_name}. It should be between 1 and ${hostel.total_rooms} or it should be under the total_rooms limit` });
+    }
+
+     // ✅ Check if the room has reached max occupancy
+    const existingStudents = await Student.countDocuments({
+      hostel_id,
+      room_no
+    });
+
+    if (existingStudents >= hostel.room_occupancy) {
+      return res.status(400).json({ error: `Room ${room_no} in ${hostel.hostel_name} is already full` });
+    }
 
     const { student, parents, password } = await adminService.createStudentWithParents(studentData, parentsData, created_by);
 

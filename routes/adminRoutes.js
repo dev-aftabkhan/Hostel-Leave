@@ -8,6 +8,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post("/create-warden", authMiddleware, admincontroller.createWarden);
 router.post("/create-admin", authMiddleware, admincontroller.createAdmin);
 router.post("/create-hostel", authMiddleware, admincontroller.createHostel);
+router.put("/update-hostel/:hostel_id", authMiddleware, admincontroller.updateHostel);
+router.put("/inactive-hostel/:hostel_id", authMiddleware, admincontroller.inactiveHostel);
 router.post("/create-student", authMiddleware, admincontroller.createStudent);
 router.post("/login/admin", admincontroller.adminLogin);
 router.post("/create-branch", authMiddleware, admincontroller.createBranch);
