@@ -173,11 +173,11 @@ exports.getRequestById = async (requestId) => {
   if (!requests) throw new Error("Request not found");
 
   // get senior_warden
-  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash", "-fcm_tokens");
+  const seniorWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "senior_warden" }).select("-password_hash -fcm_tokens");
   if (!seniorWarden) throw new Error("Senior Warden not found");
 
   // get assistant_warden
-  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash", "-fcm_tokens");
+  const assistantWarden = await Warden.findOne({ hostel_id: student.hostel_id, role: "warden" }).select("-password_hash -fcm_tokens");
   if (!assistantWarden) throw new Error("Assistant Warden not found");
 
   return {requests, seniorWarden, assistantWarden};

@@ -7,6 +7,7 @@ const securityGuardSchema = new mongoose.Schema({
   password_hash: { type: String, required: true },
   phone_no: { type: String, required: true },
   email: { type: String },
+  active: { type: Boolean, default: true },
   created_by: { type: String },
   created_at: { type: Date, default: Date.now },
   updated_by: { type: String },

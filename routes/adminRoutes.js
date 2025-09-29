@@ -24,5 +24,7 @@ router.post("/create-branch", authMiddleware, admincontroller.createBranch);
 router.post("/update-branch/:branch_id", authMiddleware, admincontroller.updateBranch);
 router.put("/reset-password", authMiddleware, admincontroller.resetPassword);
 router.post("/create-security-guard", authMiddleware, admincontroller.createSecurityGuard);
+router.put("/update-security-guard/:emp_id", authMiddleware, admincontroller.updateSecurityGuardByEmpId);
+router.get("/all-security-guards", authMiddleware, admincontroller.getAllSecurityGuards);
 
 module.exports = router;

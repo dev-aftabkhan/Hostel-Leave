@@ -58,7 +58,7 @@ const updateWardenByEmpId = async (emp_id, data) => {
 
 // get all wardens with their hostels and roles
 const getAllWardens = async () => {
-  const wardens = await Warden.find().populate("hostel_id", "hostel_name").select("-password_hash", "-fcm_tokens");
+  const wardens = await Warden.find().populate("hostel_id", "hostel_name").select("-password_hash -fcm_tokens");
   return wardens;
 };
 
@@ -371,7 +371,19 @@ const createSecurityGuard = async (data) => {
   return {newGuard, plainPassword};
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins };
+// update security guard by emp_id
+const updateSecurityGuardByEmpId = async (emp_id, data) => {
+  const guard = await SecurityGuard.findOne({ emp_id });
+  if (!guard) throw new Error("Security guard not found");
+  Object.assign(guard, data);
+  await guard.save();
+  return guard;
+};
 
+// get all security guards
+const getAllSecurityGuards = async () => {
+  const guards = await SecurityGuard.find().select("-password_hash");
+  return guards;
+};
 
- 
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins, updateSecurityGuardByEmpId, getAllSecurityGuards };

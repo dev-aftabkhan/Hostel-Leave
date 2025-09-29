@@ -406,3 +406,37 @@ exports.createSecurityGuard = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// Update Security Guard
+exports.updateSecurityGuardByEmpId = async (req, res) => {
+  try {
+    const { emp_id } = req.params;
+    const decryptedBody = req.body;
+    const updated_by = req.user.id; // from auth middleware
+
+    const guard = await adminService.updateSecurityGuardByEmpId(emp_id, {
+      ...decryptedBody,
+      updated_by
+    });
+
+    res.status(200).json({
+      message: "Security guard updated successfully",
+      securityGuard: guard
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get all security guards
+exports.getAllSecurityGuards = async (req, res) => {
+  try {
+    const guards = await adminService.getAllSecurityGuards();
+    res.status(200).json({
+      message: "All security guards retrieved successfully",
+      data: guards
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
