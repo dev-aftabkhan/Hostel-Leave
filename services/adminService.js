@@ -96,7 +96,13 @@ const updateAdminByEmpId = async (emp_id, data) => {
   return admin;
 };
 
-// ✅ Create Hostel
+// get all admins
+const getAllAdmins = async () => {
+  const admins = await Admin.find().select("-password_hash");
+  return admins;
+};
+
+// Create Hostel
 const createHostel = async (data) => {
   const {hostel_name, check_out_start_time, latest_return_time, outing_allowed, room_occupancy, total_rooms, created_by } = data;
 
@@ -365,7 +371,7 @@ const createSecurityGuard = async (data) => {
   return {newGuard, plainPassword};
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId };
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins };
 
 
-// optional checks
+ 

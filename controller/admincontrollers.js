@@ -96,6 +96,19 @@ exports.updateAdminByEmpId = async (req, res) => {
   }
 };
 
+// Get all Admins
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const admins = await adminService.getAllAdmins();
+    res.status(200).json({
+      message: "Admins retrieved successfully",
+      admins
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 // Create Hostel
 exports.createHostel = async (req, res) => {
   try {
