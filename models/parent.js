@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { act } = require("react");
 
 const parentSchema = new mongoose.Schema({
   parent_id: { type: String, required: true, unique: true },
@@ -7,6 +8,7 @@ const parentSchema = new mongoose.Schema({
   relation: { type: String, default: "Parent" },
   phone_no: { type: String, required: true },
   email: { type: String, default: "" },
+  active: { type: Boolean, default: true },
   fcm_tokens: [{ type: String }],
   language_preference: { type: String, default: "en" },
   created_by: { type: String },

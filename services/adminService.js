@@ -110,6 +110,31 @@ const inactiveHostel = async (hostel_id) => {
   return hostel;
 };
 
+// get hostel by id
+const getHostelById = async (hostel_id) => {
+  const hostel = await Hostel.findOne({ hostel_id });
+  if (!hostel) throw new Error("Hostel not found");
+  return hostel;
+};
+
+//get student list by enrollment number
+const getStudentByEnrollmentNo = async (student_enrollment_no) => {
+  const student = await Student.findOne({ enrollment_no: student_enrollment_no }).select("-password_hash");
+  if (!student) throw new Error("Student not found");
+  return student;
+};
+
+// get every detail of all student and their respected parents
+const getAllStudentsWithParents = async () => {
+  const students = await Student.find().select("-password_hash");
+  const parents = await Parent.find();
+
+  return students.map(student => {
+    const studentParents = parents.filter(parent => parent.student_enrollment_no.includes(student.enrollment_no));
+    return { student, parents: studentParents };
+  });
+};
+
 // login admin
 const loginAdmin = async (emp_id, password) => {
   const admin = await Admin.findOne({ emp_id });
@@ -173,6 +198,56 @@ async function createStudentWithParents(studentData, parentsData, created_by) {
   return { student, parents: savedParents, password: plainPassword };
 };
 
+// update student and parents
+const updateStudentAndParents = async (
+  student_enrollment_no,
+  studentData = {},
+  parentsData = [],
+  updated_by
+) => {
+  // 1. Find student
+  const student = await Student.findOne({ enrollment_no: student_enrollment_no });
+  if (!student) throw new Error("Student not found");
+
+  // 2. Update only the fields that came in studentData
+  if (Object.keys(studentData).length > 0) {
+    student.set(studentData); 
+    student.updated_by = updated_by;
+    await student.save();
+  }
+
+  // 3. Update or create parents if provided
+  const savedParents = [];
+  if (Array.isArray(parentsData) && parentsData.length > 0) {
+    for (let parent of parentsData) {
+      if (!parent.phone_no) continue; // skip invalid entries
+
+      let parentDoc = await Parent.findOne({ phone_no: parent.phone_no });
+
+      if (parentDoc) {
+        // update only provided fields
+        Object.assign(parentDoc, parent);
+        parentDoc.updated_by = updated_by;
+        await parentDoc.save();
+      } else {
+        // create new parent
+        const parent_id = "PAR_" + uuidv4().slice(0, 8);
+        parentDoc = new Parent({
+          parent_id,
+          student_enrollment_no: [student.enrollment_no],
+          ...parent,
+          created_by: updated_by,
+        });
+           
+        await parentDoc.save();
+      }
+      savedParents.push(parentDoc);
+    }
+  }
+
+  return { student, parents: savedParents };
+};
+
 // create branch
 const createBranch = async (data) => {
   const { branch_name, max_semester, created_by } = data;
@@ -189,6 +264,16 @@ const createBranch = async (data) => {
 
   await newBranch.save();
   return newBranch;
+};
+
+// delete branch (soft delete)
+const updateBranch = async (branch_id, data) => {
+  const branch = await Branch.findOne({ branch_id });
+  if (!branch) throw new Error("Branch not found");
+
+  Object.assign(branch, data);
+  await branch.save();
+  return branch;
 };
 
 // reset password by id for all by checking previous password
@@ -253,7 +338,7 @@ const createSecurityGuard = async (data) => {
   return {newGuard, plainPassword};
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel };
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents };
 
 
 // optional checks

@@ -113,6 +113,21 @@ exports.inactiveHostel = async (req, res) => {
   }
 };
 
+// get hostel by id
+exports.getHostelById = async (req, res) => {
+  try {
+    const { hostel_id } = req.params;
+    const hostel = await adminService.getHostelById(hostel_id);
+
+    res.status(200).json({
+      message: "Hostel retrieved successfully",
+      hostel
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 // Admin Login
 exports.adminLogin = async (req, res) => {
   try {
@@ -213,6 +228,53 @@ exports.createStudent = async (req, res) => {
   }
 };
 
+// update student and parents
+exports.updateStudent = async (req, res) => {
+  try {
+    const { student_enrollment_no } = req.params;
+    const decryptedBody = req.body; // assuming body is decrypted here
+    const { student: studentData, parents: parentsData } = decryptedBody;
+    const updated_by = req.user.id; // from auth middleware
+
+    const { student, parents } = await adminService.updateStudentAndParents(student_enrollment_no, studentData, parentsData, updated_by);
+
+    res.status(200).json({
+      message: "Student and parents updated successfully",
+      student,
+      parents
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get list of student by enrollment number
+exports.getStudentByEnrollmentNo = async (req, res) => {
+  try {
+    const { student_enrollment_no } = req.params;
+    const student = await adminService.getStudentByEnrollmentNo(student_enrollment_no);
+    res.status(200).json({
+      message: "Student retrieved successfully",
+      student
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get all students with parents
+exports.getAllStudentsWithParents = async (req, res) => {
+  try {
+    const studentsWithParents = await adminService.getAllStudentsWithParents();
+    res.status(200).json({
+      message: "All students retrieved successfully",
+      data: studentsWithParents
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 // ✅ Create Branch
 exports.createBranch = async (req, res) => {
   try {
@@ -230,6 +292,21 @@ exports.createBranch = async (req, res) => {
     // 🔐 encrypt response
     res.status(201).json({
       message: "Branch created successfully",
+      branch
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Delete Branch (soft delete)
+exports.updateBranch = async (req, res) => {
+  try {
+    const { branch_id } = req.params;
+    const branch = await adminService.updateBranch(branch_id, req.body);
+
+    res.status(200).json({
+      message: "Branch updated successfully",
       branch
     });
   } catch (err) {
