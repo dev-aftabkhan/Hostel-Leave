@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { act } = require("react");
 
 const WardenSchema = new mongoose.Schema({
   warden_id: { type: String, unique: true, required: true },
@@ -7,6 +8,7 @@ const WardenSchema = new mongoose.Schema({
   password_hash: { type: String, required: true },
   phone_no: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  active: { type: Boolean, default: true },
   created_by: { type: String },
   created_at: { type: Date, default: Date.now },
   updated_by: { type: String },

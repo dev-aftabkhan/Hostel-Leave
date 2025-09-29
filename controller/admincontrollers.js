@@ -2,12 +2,10 @@ const adminService = require("../services/adminService");
 const Student = require("../models/student");
 const Hostel = require("../models/hostel");
 
-// ✅ Create Warden
+// Create Warden
 exports.createWarden = async (req, res) => {
   try {
-    // 🔓 decrypt incoming body
-    const decryptedBody = req.body;
-    const { wardenType, name, emp_id, hostel_id, phone_no, email } = decryptedBody;
+    const { wardenType, name, emp_id, hostel_id, phone_no, email } = req.body;
     const created_by = req.user.admin_id; // from auth middleware
     const { warden, plainPassword } = await adminService.createWarden(wardenType, {
       name,
@@ -18,7 +16,7 @@ exports.createWarden = async (req, res) => {
       created_by
     });
 
-    // 🔐 encrypt response
+     
     res.status(201).json({
       message: `${wardenType} created successfully`,
       emp_id: warden.emp_id,
@@ -29,10 +27,38 @@ exports.createWarden = async (req, res) => {
   }
 };
 
-// ✅ Create Admin
+//update warden by emp_id
+exports.updateWardenByEmpId = async (req, res) => {
+  try {
+    const { emp_id } = req.params;
+    const updatedData = req.body;
+    const warden = await adminService.updateWardenByEmpId(emp_id, updatedData);
+    res.status(200).json({
+      message: "Warden updated successfully",
+      warden
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get all wardens with their hostels and roles
+exports.getAllWardens = async (req, res) => {
+  try {
+    const wardens = await adminService.getAllWardens();
+    res.status(200).json({
+      message: "Wardens retrieved successfully",
+      wardens
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Create Admin
 exports.createAdmin = async (req, res) => {
   try {
-    // 🔓 decrypt incoming body
+     
     const decryptedBody = req.body;
     const { name, email, emp_id, phone_no } = decryptedBody;
     const created_by = req.user.admin_id; // from auth middleware
@@ -44,7 +70,7 @@ exports.createAdmin = async (req, res) => {
       created_by
     });
 
-    // 🔐 encrypt response
+     
     res.status(201).json({
       message: "Admin created successfully",
       emp_id: admin.emp_id,
@@ -55,11 +81,25 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
-// ✅ Create Hostel
+// Update Admin
+exports.updateAdminByEmpId = async (req, res) => {
+  try {
+    const { emp_id } = req.params;
+    const updatedData = req.body;
+    const admin = await adminService.updateAdminByEmpId(emp_id, updatedData);
+    res.status(200).json({
+      message: "Admin updated successfully",
+      admin
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Create Hostel
 exports.createHostel = async (req, res) => {
   try {
-    // 🔓 decrypt incoming body
-    const decryptedBody = req.body;
+     const decryptedBody = req.body;
     const { hostel_name, check_out_start_time, latest_return_time, outing_allowed, room_occupancy, total_rooms } = decryptedBody;
     const created_by = req.user.id; // from auth middleware
     const hostel = await adminService.createHostel({
@@ -72,8 +112,7 @@ exports.createHostel = async (req, res) => {
       created_by
     });
 
-    // 🔐 encrypt response
-    res.status(201).json({
+     res.status(201).json({
       message: "Hostel created successfully",
       hostel
     });
@@ -82,7 +121,7 @@ exports.createHostel = async (req, res) => {
   }
 };
 
-// ✅ Update Hostel
+// Update Hostel
 exports.updateHostel = async (req, res) => {
   try {
     const { hostel_id } = req.params;
@@ -205,7 +244,7 @@ exports.createStudent = async (req, res) => {
       return res.status(400).json({ error: `Invalid room number for ${hostel.hostel_name}. It should be between 1 and ${hostel.total_rooms} or it should be under the total_rooms limit` });
     }
 
-     // ✅ Check if the room has reached max occupancy
+    // Check if the room has reached max occupancy
     const existingStudents = await Student.countDocuments({
       hostel_id,
       room_no
@@ -275,11 +314,10 @@ exports.getAllStudentsWithParents = async (req, res) => {
   }
 };
 
-// ✅ Create Branch
+// Create Branch
 exports.createBranch = async (req, res) => {
   try {
-    // 🔓 decrypt incoming body
-    const decryptedBody = req.body;
+     const decryptedBody = req.body;
     const { branch_name, max_semester } = decryptedBody;
     const created_by = req.user.id; // from auth middleware
 
@@ -289,8 +327,7 @@ exports.createBranch = async (req, res) => {
       created_by
     });
 
-    // 🔐 encrypt response
-    res.status(201).json({
+     res.status(201).json({
       message: "Branch created successfully",
       branch
     });
@@ -331,7 +368,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// ✅ Create Security Guard
+// Create Security Guard
 exports.createSecurityGuard = async (req, res) => {
   try {
     const decryptedBody = req.body;
@@ -347,8 +384,7 @@ exports.createSecurityGuard = async (req, res) => {
     });
      
 
-    // 🔐 encrypt response
-    res.status(201).json({
+     res.status(201).json({
       message: "Security guard created successfully",
       securityGuard: newGuard,
       password: plainPassword

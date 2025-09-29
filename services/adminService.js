@@ -8,6 +8,7 @@ const SecurityGuard = require("../models/security");
 const { v4: uuidv4 } = require("uuid");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
+const { default: mongoose } = require("mongoose");
 
 // ✅ Create Warden (senior or assistant -> handled by role)
 const createWarden = async (wardenType, data) => {
@@ -22,7 +23,7 @@ const createWarden = async (wardenType, data) => {
 
   // only one senior per hostel
   if (wardenType === "senior_warden" || wardenType === "warden") {
-    const existingWarden = await Warden.findOne({ hostel_id, role: wardenType });
+    const existingWarden = await Warden.findOne({ hostel_id, role: wardenType, active: true });
     if (existingWarden) throw new Error(`Hostel ${hostel_id} already has a ${wardenType}`);
   }
 
@@ -45,6 +46,22 @@ const createWarden = async (wardenType, data) => {
   return { warden: newWarden, plainPassword };
 };
 
+//update warden by emp_id
+const updateWardenByEmpId = async (emp_id, data) => {
+  const warden = await Warden.findOne({ emp_id });
+  if (!warden) throw new Error("Warden not found");
+
+  Object.assign(warden, data);
+  await warden.save();
+  return warden;
+};
+
+// get all wardens with their hostels and roles
+const getAllWardens = async () => {
+  const wardens = await Warden.find().populate("hostel_id", "hostel_name").select("-password_hash", "-fcm_tokens");
+  return wardens;
+};
+
 // ✅ Create Admin
 const createAdmin = async (data) => {
   const { name, email, emp_id, phone_no, created_by } = data;
@@ -56,7 +73,7 @@ const createAdmin = async (data) => {
   const password_hash = await hashPassword(plainPassword);
 
   const newAdmin = new Admin({
-    admin_id: "ADMIN-" + emp_id,
+    admin_id: new mongoose.Types.ObjectId().toString(),
     emp_id,
     name,
     password_hash,
@@ -67,6 +84,16 @@ const createAdmin = async (data) => {
 
   await newAdmin.save();
   return { admin: newAdmin, plainPassword };
+};
+
+//update admin by emp_id
+const updateAdminByEmpId = async (emp_id, data) => {
+  const admin = await Admin.findOne({ emp_id });
+  if (!admin) throw new Error("Admin not found");
+
+  Object.assign(admin, data);
+  await admin.save();
+  return admin;
 };
 
 // ✅ Create Hostel
@@ -338,7 +365,7 @@ const createSecurityGuard = async (data) => {
   return {newGuard, plainPassword};
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents };
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId };
 
 
 // optional checks

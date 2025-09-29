@@ -6,6 +6,8 @@ const authMiddleware = require("../middleware/authMiddleware");
  
 
 router.post("/create-warden", authMiddleware, admincontroller.createWarden);
+router.put("/update-warden/:emp_id", authMiddleware, admincontroller.updateWardenByEmpId);
+router.get("/all-wardens", authMiddleware, admincontroller.getAllWardens);
 router.post("/create-admin", authMiddleware, admincontroller.createAdmin);
 router.post("/create-hostel", authMiddleware, admincontroller.createHostel);
 router.put("/update-hostel/:hostel_id", authMiddleware, admincontroller.updateHostel);
