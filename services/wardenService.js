@@ -22,18 +22,28 @@ const loginWarden = async (emp_id, wardenType, password) => {
 const getAllActiveRequestsByHostelId = async (hostelId, status) => {
 
   // find students in that hostel
-  const students = await Student.find({ hostel_id: hostelId });
+  const students = await Student.find({ hostel_id: hostelId }).select("-_id -password_hash -fcm_tokens");
   if (!students || students.length === 0) throw new Error("No students found in this hostel");
  
   // now get requests of those students which are active
   const studentIds = students.map((student) => student.enrollment_no);
    
-  const activeRequests = await Request.find({
-    student_enrollment_number: { $in: studentIds },
-    active: true,
-    request_status: { $in: status }
-  }).sort({ created_at: -1 });
-   if (!activeRequests || activeRequests.length === 0) throw new Error("No active requests found for this hostel");
+  // get requests with status and students info
+  const activeRequests = await Request.find({ student_enrollment_number: { $in: studentIds }, request_status: status, active: true })
+    .populate("student_action.action_by", "name enrollment_no")
+    .populate("parent_action.action_by", "name")
+    .sort({ created_at: -1 })
+    .lean(); // use lean() to get plain JS objects
+
+  // map student info to requests
+  for (let request of activeRequests) {
+    const studentInfo = students.find((student) => student.enrollment_no === request.student_enrollment_number);
+    if (studentInfo) {
+      request.student_info = studentInfo;
+    }
+  }
+console.log(activeRequests);
+  if (!activeRequests || activeRequests.length === 0) throw new Error("No active requests found for this hostel");
   return activeRequests;
 };
 
