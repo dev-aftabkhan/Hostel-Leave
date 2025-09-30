@@ -34,8 +34,16 @@ exports.getAllActiveRequestsByHostelId = async (req, res) => {
     {
       status = "accepted_by_parent";
     }
+    
+    // get hostel if from params
+    const { hostelId } = req.params;
+    
+    // check if the hostel is from the wardens hostels list
+    if (!user.hostel_id.includes(hostelId)) {
+      throw new Error("You are not authorized to view requests for this hostel");
+    }
 
-    const requests = await wardenService.getAllActiveRequestsByHostelId(user.hostel_id, status);
+    const requests = await wardenService.getAllActiveRequestsByHostelId(hostelId, status);
 
     res.status(200).json({
       message: "Active requests fetched successfully",

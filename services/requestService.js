@@ -182,3 +182,11 @@ exports.getRequestById = async (requestId) => {
 
   return {requests, seniorWarden, assistantWarden};
 };
+
+// get all requests by hostel id 
+exports.getAllRequestsByHostelId = async (hostelId) => {
+  const students = await Student.find({ hostel_id: hostelId }).select("enrollment_no -_id");
+  const enrollmentNumbers = students.map(student => student.enrollment_no);
+  const requests = await Request.find({ student_enrollment_number: { $in: enrollmentNumbers }, active: true }).sort({ created_at: -1 });
+  return requests;
+};

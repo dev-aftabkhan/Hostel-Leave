@@ -126,4 +126,17 @@ exports.getRequestById = async (req, res) => {
   }
 };
 
- 
+// get all requests by hostel id
+exports.getAllRequestsByHostelId = async (req, res) => {
+  try {
+    const hostelId = req.params.hostelId;
+    const requests = await requestService.getAllRequestsByHostelId(hostelId);
+
+    res.status(200).json({
+      message: "All requests retrieved successfully",
+      requests
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

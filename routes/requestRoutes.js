@@ -9,4 +9,5 @@ router.get("/ByStatus/:status", authMiddleware, requestController.getRequestsByS
 router.get("/inactive-requests", authMiddleware, requestController.getAllInactiveRequestsByStudentEnrollmentNo);
 router.get("/requests/:status", authMiddleware, requestController.getRequestsByStudentEnrollmentNoAndStatus);
 router.get("/request/:id", authMiddleware, requestController.getRequestById);
+router.get("/hostel-requests/:hostelId", authMiddleware, requestController.getAllRequestsByHostelId);
 module.exports = router;

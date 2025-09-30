@@ -4,7 +4,7 @@ const wardencontroller = require("../controller/wardenControllers");
 const authMiddleware = require("../middleware/authMiddleware");
 
 router.post("/login/warden", wardencontroller.wardenLogin);
-router.get("/allRequest", authMiddleware, wardencontroller.getAllActiveRequestsByHostelId);
+router.get("/allRequest/:hostelId", authMiddleware, wardencontroller.getAllActiveRequestsByHostelId);
 router.get("/profile", authMiddleware, wardencontroller.getWardenProfile)
 
 module.exports = router;
