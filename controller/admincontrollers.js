@@ -440,3 +440,43 @@ exports.getAllSecurityGuards = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// get total no. of students with their info
+exports.getTotalStudents = async (req, res) => {
+  try {
+    const { totalStudents, studentInfo } = await adminService.getTotalStudents();
+    res.status(200).json({
+      message: "Total students retrieved successfully",
+      totalStudents,
+      studentInfo
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get student which are out for outing or leave
+exports.getOutStudents = async (req, res) => {
+  try {
+    const outStudents = await adminService.getOutStudents();
+    res.status(200).json({
+      message: "Out students retrieved successfully",
+      data: outStudents
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get all active requests 
+exports.getAllActiveRequests = async (req, res) => {
+  try {
+    const activeRequests = await adminService.getAllActiveRequests();
+    res.status(200).json({
+      message: "Active requests retrieved successfully",
+      data: activeRequests
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

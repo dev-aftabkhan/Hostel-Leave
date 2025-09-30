@@ -18,6 +18,8 @@ router.get("/hostel/:hostel_id", authMiddleware, admincontroller.getHostelById);
 router.post("/create-student", authMiddleware, admincontroller.createStudent);
 router.put("/update-student/:student_enrollment_no", authMiddleware, admincontroller.updateStudent);
 router.get("/student/:student_enrollment_no", authMiddleware, admincontroller.getStudentByEnrollmentNo);
+router.get("/total-students", authMiddleware, admincontroller.getTotalStudents);
+router.get("/outstudents", authMiddleware, admincontroller.getOutStudents);
 router.get("/all-students", authMiddleware, admincontroller.getAllStudentsWithParents);
 router.post("/login/admin", admincontroller.adminLogin);
 router.post("/create-branch", authMiddleware, admincontroller.createBranch);
@@ -26,5 +28,6 @@ router.put("/reset-password", authMiddleware, admincontroller.resetPassword);
 router.post("/create-security-guard", authMiddleware, admincontroller.createSecurityGuard);
 router.put("/update-security-guard/:emp_id", authMiddleware, admincontroller.updateSecurityGuardByEmpId);
 router.get("/all-security-guards", authMiddleware, admincontroller.getAllSecurityGuards);
+router.get("/all-active-requests", authMiddleware, admincontroller.getAllActiveRequests);
 
 module.exports = router;

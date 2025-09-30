@@ -4,6 +4,7 @@ const Hostel = require("../models/hostel");
 const Student = require("../models/student");
 const Parent  = require("../models/parent");
 const Branch = require("../models/branch");
+const Request = require("../models/request");
 const SecurityGuard = require("../models/security");
 const { v4: uuidv4 } = require("uuid");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
@@ -386,4 +387,43 @@ const getAllSecurityGuards = async () => {
   return guards;
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins, updateSecurityGuardByEmpId, getAllSecurityGuards };
+// get total no. of students with their info
+const getTotalStudents = async () => {
+  const totalStudents = await Student.countDocuments();
+  const studentInfo = await Student.find().select("-password_hash -fcm_tokens");
+  return { totalStudents, studentInfo };
+};
+
+// get students which are out for outing or leave
+const getOutStudents = async () => {
+  const outStudents = await Request.find({ security_status: "out" }).select("-password_hash -fcm_tokens");
+
+  let students = null;
+  // get student details for each request
+  for (let request of outStudents) {
+    const student = await Student.findOne({ enrollment_no: request.student_enrollment_number }).select("-password_hash -fcm_tokens");
+    students = students ? [...students, student] : [student];
+  }
+  return students;
+};
+
+// get all active requests
+const getAllActiveRequests = async () => {
+  const activeRequests = await Request.find({ active: true })
+    .sort({ created_at: -1 })
+    .lean(); // use lean() to get plain JS objects
+
+  // map student info to requests
+  for (let request of activeRequests) {
+    const studentInfo = await Student.findOne({ enrollment_no: request.student_enrollment_number }).select("-password_hash -fcm_tokens");
+    if (studentInfo) {
+      request.student_info = studentInfo;
+    }
+
+  if (!activeRequests || activeRequests.length === 0) throw new Error("No active requests found");
+  return activeRequests;
+};
+
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins, updateSecurityGuardByEmpId, getAllSecurityGuards, getTotalStudents, getOutStudents, getAllActiveRequests };
