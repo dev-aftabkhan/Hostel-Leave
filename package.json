@@ -14,5 +14,15 @@
     "path": "^0.12.7",
     "react": "^19.1.1",
     "uuid": "^11.1.0"
+  } ,
+
+  "scripts": {
+    "start": "node server.js"
   }
+
+
+
+
 }
+
+
