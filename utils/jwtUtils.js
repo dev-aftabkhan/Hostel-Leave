@@ -8,8 +8,8 @@ const generateToken = (payload) => {
 
 const verifyToken = (encryptedToken) => {
   try {
-    const { token } = encryptedToken;
-    return jwt.verify(token, process.env.JWT_SECRET);
+    //const { token } = encryptedToken;
+    return jwt.verify(encryptedToken, process.env.JWT_SECRET);
   } catch (err) {
     throw new Error("Invalid or expired token");
   }
