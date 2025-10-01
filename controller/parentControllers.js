@@ -1,7 +1,7 @@
 const parentService = require("../services/parentService");
 const Student = require("../models/student");
 const Parent = require("../models/parent");
-const { decryptData, encryptData } = require("../utils/cryptoUtils");
+ 
 
 // login parent
 const loginParent = async (req, res) => {
