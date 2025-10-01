@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const { encryptData, decryptData } = require("./cryptoUtils");
 require("dotenv").config();
 
 const generateToken = (payload) => {
