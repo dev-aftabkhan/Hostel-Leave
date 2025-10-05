@@ -43,8 +43,8 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
 
   // 🔹 Parent action
   else {
-    const parent = await Parent.findOne({ parent_id: userID }).select("-password_hash", "-fcm_tokens");
-    console.log(parent);
+    const parent = await Parent.findOne({ parent_id: userID }).select("-password_hash -fcm_tokens");
+     
     if (parent) {
       userRole = "parent";
       if (request.request_status === "referred_to_parent") {
@@ -66,7 +66,7 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
 
     // 🔹 Senior Warden action
     else {
-      const seniorWarden = await Warden.findOne({ warden_id: userID, role: "senior_warden" }).select("-password_hash", "-fcm_tokens");
+      const seniorWarden = await Warden.findOne({ warden_id: userID, role: "senior_warden" }).select("-password_hash -fcm_tokens");
       if (seniorWarden) {
         userRole = "senior_warden";
         if (request.request_status === "accepted_by_parent") {
@@ -88,7 +88,7 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
 
       // 🔹 Assistant Warden action
       else {
-        const assistantWarden = await Warden.findOne({ warden_id: userID, role: "warden" }).select("-password_hash", "-fcm_tokens");
+        const assistantWarden = await Warden.findOne({ warden_id: userID, role: "warden" }).select("-password_hash -fcm_tokens");
         if (assistantWarden) {
           userRole = "assistant_warden";
           if (request.request_status === "requested") {
@@ -110,7 +110,7 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
 
         // 🔹 security guard action
         else {
-          const securityGuard = await Security.findOne({ security_guard_id: userID }).select("-password_hash", "-fcm_tokens") ;
+          const securityGuard = await Security.findOne({ security_guard_id: userID }).select("-password_hash -fcm_tokens");
           if (securityGuard) {
             userRole = "security_guard";
             if (request.request_status === "accepted_by_warden" && request.security_status === "pending") {
