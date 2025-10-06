@@ -90,3 +90,22 @@ exports.getAllRequestsByHostelIdAndMonth = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+
+// get count of all active requests by hostel id
+exports.getCountOfActiveRequestsByHostelId = async (req, res) => {
+  try {
+    const { hostelId } = req.params;
+    const role = req.user.role;
+    const { count, outCount, lateCount, actionCount } = await wardenService.countOfActiveRequestsByHostelId(hostelId, role);
+    res.status(200).json({
+      message: "Count fetched successfully",
+      count,
+      outCount,
+      lateCount,
+      actionCount
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

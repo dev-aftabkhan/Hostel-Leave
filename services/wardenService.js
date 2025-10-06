@@ -77,11 +77,57 @@ const getAllRequestsByHostelIdAndMonth = async (hostelId, month) => {
   return requests;
 };
 
+// count of all active requests by hostel id
+const countOfActiveRequestsByHostelId = async (hostelId, role) => {
+  const students = await Student.find({ hostel_id: hostelId }).select("enrollment_no -_id");
+  if (!students || students.length === 0) throw new Error("No students found in this hostel");
+
+  const studentIds = students.map((student) => student.enrollment_no);
+
+  const count = await Request.countDocuments({
+    student_enrollment_number: { $in: studentIds },
+    active: true
+  });
+
+  // count students out of hostel
+  const outCount = await Request.countDocuments({
+    student_enrollment_number: { $in: studentIds },
+    security_status: "out",
+    active: true
+  });
+
+  // count late students as they cross the applied_to time and still not in
+  const now = new Date();
+  const lateCount = await Request.countDocuments({
+    student_enrollment_number: { $in: studentIds },
+    applied_to: { $lt: now },
+    active: true
+  });
+  let actionCount = 0;
+  // total count of request on which the warden has to take action
+  if(role === "warden") {
+    actionCount = await Request.countDocuments({
+      student_enrollment_number: { $in: studentIds },
+      request_status: { $in: ["requested"] },
+      active: true
+    });
+  } else if(role === "senior_warden") {
+    actionCount = await Request.countDocuments({
+      student_enrollment_number: { $in: studentIds },
+      request_status: { $in: ["accepted_by_parent"] },
+      active: true
+    });
+  }
+
+  return { count, outCount, lateCount, actionCount };
+};
+
 module.exports = {
   loginWarden,
   getAllActiveRequestsByHostelId,
   getWardenById,
-  getAllRequestsByHostelIdAndMonth
+  getAllRequestsByHostelIdAndMonth,
+  countOfActiveRequestsByHostelId
 };
 
  
