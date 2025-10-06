@@ -54,7 +54,7 @@ exports.getAllActiveRequestsByHostelId = async (req, res) => {
   }
 };
 
-// ✅ Get warden profile
+// Get warden profile
 exports.getWardenProfile = async (req, res) => {
   try {
     const wardenId = req.user.id;
@@ -63,6 +63,28 @@ exports.getWardenProfile = async (req, res) => {
      res.status(200).json({
       message: "profile fetched successfully",
       profile
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Get all requests by hostel id and month
+exports.getAllRequestsByHostelIdAndMonth = async (req, res) => {
+  try {
+    const user = await Warden.findOne({ warden_id: req.user.id });
+    const { hostelId, month } = req.params;
+
+    // check if the hostel is from the wardens hostels list
+    if (!user.hostel_id.includes(hostelId)) {
+      throw new Error("You are not authorized to view requests for this hostel");
+    }
+
+    const requests = await wardenService.getAllRequestsByHostelIdAndMonth(hostelId, month);
+
+    res.status(200).json({
+      message: "Requests fetched successfully",
+      requests
     });
   } catch (err) {
     res.status(400).json({ error: err.message });

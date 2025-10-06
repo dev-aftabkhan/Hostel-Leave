@@ -54,10 +54,34 @@ const getWardenById = async (wardenId) => {
   return warden;
 };
 
+// get all requests by hostel id and month
+const getAllRequestsByHostelIdAndMonth = async (hostelId, month) => {
+  // Parse month as YYYY-MM
+  const [year, monthIndex] = month.split('-').map(Number); // monthIndex: 1-12
+  const startDate = new Date(Date.UTC(year, monthIndex - 1, 1, 0, 0, 0)); // start of month UTC
+  const endDate = new Date(Date.UTC(year, monthIndex, 1, 0, 0, 0));       // start of next month UTC
+
+  const students = await Student.find({ hostel_id: hostelId }).select("-_id -password_hash -fcm_tokens");
+  if (!students || students.length === 0) throw new Error("No students found in this hostel");
+ 
+  // now get requests of those students which are active
+  const studentIds = students.map((student) => student.enrollment_no);
+
+  const requests = await Request.find({
+    student_enrollment_number: { $in: studentIds },
+    created_at: { $gte: startDate, $lt: endDate }
+  }).sort({ created_at: -1 })
+    .lean();
+
+  if (!requests || requests.length === 0) throw new Error("No requests found for this hostel and month");
+  return requests;
+};
+
 module.exports = {
   loginWarden,
   getAllActiveRequestsByHostelId,
-  getWardenById
+  getWardenById,
+  getAllRequestsByHostelIdAndMonth
 };
 
  
