@@ -8,5 +8,6 @@ router.get("/allRequest/:hostelId", authMiddleware, wardencontroller.getAllActiv
 router.get("/profile", authMiddleware, wardencontroller.getWardenProfile)
 router.get("/requests/:hostelId/:month", authMiddleware, wardencontroller.getAllRequestsByHostelIdAndMonth);
 router.get("/statistics/:hostelId", authMiddleware, wardencontroller.getCountOfActiveRequestsByHostelId);
+router.get("/allActiveRequests/:hostelId", authMiddleware, wardencontroller.getAllActiveRequests);
 
 module.exports = router;

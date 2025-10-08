@@ -188,9 +188,31 @@ async function createStudentWithParents(studentData, parentsData, created_by) {
   const existingStudent = await Student.findOne({ enrollment_no: studentData.enrollment_no });
   if (existingStudent) throw new Error("Student with this enrollment number already exists");
 
+  // check student for phone no. uniqueness
+  const existingPhone = await Student.findOne({ phone_no: studentData.phone_no });
+  if (existingPhone) throw new Error("Student with this phone number already exists");
+
+  // check student for email uniqueness
+  const existingEmail = await Student.findOne({ email: studentData.email });
+  if (existingEmail) throw new Error("Student with this email already exists");
+
+  //check the parents for phone no. uniqueness
+  for (let parent of parentsData) {
+    const existingParent = await Student.findOne({ phone_no: parent.phone_no });
+    if (existingParent) throw new Error("This parent no. is already exist as student");
+  }
+
+  // campare parents phone no. with student phone no.
+  for (let parent of parentsData) {
+    if (parent.phone_no === studentData.phone_no) {
+      throw new Error("Parent phone number cannot be same as student phone number");
+    }
+  }
+
   const student_id = "STU_" + uuidv4().slice(0, 8);
   const plainPassword = generatePassword(10);
   const password_hash = await hashPassword(plainPassword);
+
 
 
   const student = new Student({

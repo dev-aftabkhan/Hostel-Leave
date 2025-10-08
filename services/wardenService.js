@@ -2,6 +2,7 @@ const Warden = require("../models/warden");
 const Hostel = require("../models/hostel");
 const Student = require("../models/student");
 const Request = require("../models/request");
+const Parent = require("../models/parent");
 const { generatePassword, hashPassword, comparePassword } = require("../utils/passwordUtils");
 const { generateToken } = require("../utils/jwtUtils");
 
@@ -90,9 +91,27 @@ const countOfActiveRequestsByHostelId = async (hostelId, role) => {
   });
 
   // count students out of hostel
-  const outCount = await Request.countDocuments({
+  const DayOutCount = await Request.countDocuments({
     student_enrollment_number: { $in: studentIds },
     security_status: "out",
+    request_type: "outing",
+    active: true
+  });
+
+  const LeaveCount = await Request.countDocuments({
+    student_enrollment_number: { $in: studentIds },
+    security_status: "out",
+    request_type: "leave",
+    active: true
+  });
+
+  // count request for current month
+  const Now = new Date();
+  const monthStart = new Date(Now.getFullYear(), Now.getMonth(), 1);
+  const monthEnd = new Date(Now.getFullYear(), Now.getMonth() + 1, 1); // first day of next month
+  const monthCount = await Request.countDocuments({
+    student_enrollment_number: { $in: studentIds },
+    created_at: { $gte: monthStart, $lt: monthEnd },
     active: true
   });
 
@@ -119,7 +138,42 @@ const countOfActiveRequestsByHostelId = async (hostelId, role) => {
     });
   }
 
-  return { count, outCount, lateCount, actionCount };
+  return { count, DayOutCount, LeaveCount, lateCount, actionCount, monthCount };
+};
+
+// get all active request by hostel id
+const getAllActiveRequests = async (hostelId) => {
+  const students = await Student.find({ hostel_id: hostelId }).select("-password_hash -_id -fcm_tokens");
+  if (!students || students.length === 0) throw new Error("No students found in this hostel");
+
+  const studentIds = students.map((student) => student.enrollment_no);
+
+  const parents = await Parent.find({ student_enrollment_no: { $in: studentIds } }).select("-password_hash -_id");
+  if (!parents || parents.length === 0) throw new Error("No parents found for students in this hostel");
+  console.log(parents);
+  const requests = await Request.find({
+    student_enrollment_number: { $in: studentIds },
+    active: true
+  }).lean();
+
+  // map student and parents info to requests
+  for (let request of requests) {
+    const studentInfo = students.find((student) => student.enrollment_no === request.student_enrollment_number);
+    if (studentInfo) {
+      request.student_Info = studentInfo;
+    }
+
+    // Get parent info
+    const parentInfo = parents.filter((parent) => parent.student_enrollment_no.includes(request.student_enrollment_number));
+     
+    if (parentInfo) {
+      request.parent_Info = parentInfo;
+    }
+  }
+
+  if (!requests || requests.length === 0) throw new Error("No requests found for this hostel");
+
+  return requests;
 };
 
 module.exports = {
@@ -127,7 +181,8 @@ module.exports = {
   getAllActiveRequestsByHostelId,
   getWardenById,
   getAllRequestsByHostelIdAndMonth,
-  countOfActiveRequestsByHostelId
+  countOfActiveRequestsByHostelId,
+  getAllActiveRequests
 };
 
  

@@ -1,6 +1,7 @@
 const adminService = require("../services/adminService");
 const Student = require("../models/student");
 const Hostel = require("../models/hostel");
+const EmailService = require("../utils/sendemail");
 
 // Create Warden
 exports.createWarden = async (req, res) => {
@@ -268,6 +269,25 @@ exports.createStudent = async (req, res) => {
     }
 
     const { student, parents, password } = await adminService.createStudentWithParents(studentData, parentsData, created_by);
+
+    // check if student creation was successful
+    if (student) {
+       // send email to student with their credentials
+      const emailSubject = "Hostel Leave Account Credentials";
+      const emailBody = `
+        <p>Dear <b>${student.name}</b>,</p>
+        <p>Your student account has been created successfully. Here are your login credentials:</p>
+        <ul>
+          <li><b>Enrollment Number:</b> ${student.enrollment_no}</li>
+          <li><b>Password:</b> ${password}</li>
+        </ul>
+        <p>Please change your password after your first login.</p>
+        <p>Regards,<br/>Hostel Management Team</p>
+      `;
+      // send email
+      await EmailService.sendEmail(student.email, emailSubject, emailBody);
+
+    }
 
     res.status(201).json({
       message: "Student and parents created successfully",

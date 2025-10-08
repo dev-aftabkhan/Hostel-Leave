@@ -97,13 +97,37 @@ exports.getCountOfActiveRequestsByHostelId = async (req, res) => {
   try {
     const { hostelId } = req.params;
     const role = req.user.role;
-    const { count, outCount, lateCount, actionCount } = await wardenService.countOfActiveRequestsByHostelId(hostelId, role);
+    const { count, DayOutCount, LeaveCount, lateCount, actionCount, monthCount } = await wardenService.countOfActiveRequestsByHostelId(hostelId, role);
     res.status(200).json({
       message: "Count fetched successfully",
       count,
-      outCount,
+      DayOutCount,
+      LeaveCount,
       lateCount,
-      actionCount
+      actionCount,
+      monthCount
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// get all active requests by hostel id
+exports.getAllActiveRequests = async (req, res) => {
+  try {
+    const user = await Warden.findOne({ warden_id: req.user.id });
+    const { hostelId } = req.params;
+
+    // check if the hostel is from the wardens hostels list
+    if (!user.hostel_id.includes(hostelId)) {
+      throw new Error("You are not authorized to view requests for this hostel");
+    }
+
+    const requests = await wardenService.getAllActiveRequests(hostelId);
+
+    res.status(200).json({
+      message: "Active requests fetched successfully",
+      requests
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
