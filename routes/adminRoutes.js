@@ -29,5 +29,6 @@ router.post("/create-security-guard", authMiddleware, admincontroller.createSecu
 router.put("/update-security-guard/:emp_id", authMiddleware, admincontroller.updateSecurityGuardByEmpId);
 router.get("/all-security-guards", authMiddleware, admincontroller.getAllSecurityGuards);
 router.get("/all-active-requests", authMiddleware, admincontroller.getAllActiveRequests);
+router.put("/reset-password-by-admin", authMiddleware, admincontroller.resetPasswordbyadmin);
 
 module.exports = router;

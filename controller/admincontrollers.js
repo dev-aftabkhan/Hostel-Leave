@@ -500,3 +500,33 @@ exports.getAllActiveRequests = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// reset password for admin, warden, student, and security guard
+exports.resetPasswordbyadmin = async (req, res) => {
+  try {
+    const { user_id } = req.body;
+
+    const { user, newPassword } = await adminService.resetPasswordByAdminOrWarden(user_id);
+     
+    if (user) {
+      // send email notification
+      const emailSubject = "Hostel Leave Account Credentials is Reset";
+      const emailBody = `
+        <p>Dear <b>${user.name}</b>,</p>
+        <p>Your account password has been reset successfully. Here are your login credentials:</p>
+        <ul>
+          <li><b>Password:</b> ${newPassword}</li>
+        </ul>
+        <p>Please change your password after your login.</p>
+        <p>Regards,<br/>Hostel Management Team</p>
+      `;
+      await EmailService.sendEmail(user.email, emailSubject, emailBody);
+    }
+
+    res.status(200).json({
+     user
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};

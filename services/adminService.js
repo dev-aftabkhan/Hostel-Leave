@@ -448,4 +448,38 @@ const getAllActiveRequests = async () => {
 
 };
 
-module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins, updateSecurityGuardByEmpId, getAllSecurityGuards, getTotalStudents, getOutStudents, getAllActiveRequests };
+// reset password for all by admin or warden without old password
+// user_id can be admin_id, warden_id, student_id
+const resetPasswordByAdminOrWarden = async (user_id) => {
+  const admin = await Admin.findOne({ admin_id: user_id });
+  const warden = await Warden.findOne({ warden_id: user_id }); 
+  const student = await Student.findOne({ student_id: user_id });
+  const security = await SecurityGuard.findOne({ security_guard_id: user_id });
+  const newPassword = generatePassword(10);
+
+  let user = null;
+
+   if (admin) {
+      admin.password_hash = await hashPassword(newPassword);  
+      await admin.save();
+      user = admin;
+   } else if (warden) {
+      warden.password_hash = await hashPassword(newPassword);  
+      await warden.save();
+      user = warden; 
+   } else if (student) {
+      student.password_hash = await hashPassword(newPassword);  
+      await student.save();
+      user = student;
+   } else if (security) {
+      security.password_hash = await hashPassword(newPassword);  
+      await security.save();
+      user = security;
+   } else {
+      throw new Error("User not found");
+   }  
+
+   return { user, newPassword };
+};
+
+module.exports = { createWarden, createAdmin, createHostel, loginAdmin, createStudentWithParents, createBranch, resetPasswordById, createSecurityGuard, updateHostel, inactiveHostel, updateBranch, getHostelById, updateStudentAndParents, getStudentByEnrollmentNo, getAllStudentsWithParents, updateWardenByEmpId, getAllWardens, updateAdminByEmpId, getAllAdmins, updateSecurityGuardByEmpId, getAllSecurityGuards, getTotalStudents, getOutStudents, getAllActiveRequests, resetPasswordByAdminOrWarden };
