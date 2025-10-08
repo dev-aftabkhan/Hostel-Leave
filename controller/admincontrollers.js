@@ -17,6 +17,24 @@ exports.createWarden = async (req, res) => {
       created_by
     });
 
+    if (warden) {
+       // send email to student with their credentials
+      const emailSubject = "Hostel Leave Account Credentials";
+      const emailBody = `
+        <p>Dear <b>${warden.name}</b>,</p>
+        <p>Your warden account has been created successfully. Here are your login credentials:</p>
+        <ul>
+          <li><b>Employee ID:</b> ${warden.emp_id}</li>
+          <li><b>Password:</b> ${plainPassword}</li>
+        </ul>
+        <p>Please change your password after your first login.</p>
+        <p>Regards,<br/>Hostel Management Team</p>
+      `;
+      // send email
+      await EmailService.sendEmail(warden.email, emailSubject, emailBody);
+
+    }
+
      
     res.status(201).json({
       message: `${wardenType} created successfully`,
@@ -70,6 +88,24 @@ exports.createAdmin = async (req, res) => {
       phone_no,
       created_by
     });
+
+    if (admin) {
+       // send email to student with their credentials
+      const emailSubject = "Hostel Leave Account Credentials";
+      const emailBody = `
+        <p>Dear <b>${admin.name}</b>,</p>
+        <p>Your Admin account has been created successfully. Here are your login credentials:</p>
+        <ul>
+          <li><b>Employee ID:</b> ${admin.emp_id}</li>
+          <li><b>Password:</b> ${plainPassword}</li>
+        </ul>
+        <p>Please change your password after your first login.</p>
+        <p>Regards,<br/>Hostel Management Team</p>
+      `;
+      // send email
+      await EmailService.sendEmail(admin.email, emailSubject, emailBody);
+
+    }
 
      
     res.status(201).json({
@@ -415,6 +451,25 @@ exports.createSecurityGuard = async (req, res) => {
       emp_id,
       created_by
     });
+
+    if (newGuard) {
+       // send email to student with their credentials
+      const emailSubject = "Hostel Leave Account Credentials";
+      const emailBody = `
+        <p>Dear <b>${newGuard.name}</b>,</p>
+        <p>Your security Gate account has been created successfully. Here are your login credentials:</p>
+        <ul>
+          <li><b>Employee ID:</b> ${newGuard.emp_id}</li>
+          <li><b>Password:</b> ${plainPassword}</li>
+        </ul>
+        <p>Please change your password after your first login.</p>
+        <p>Regards,<br/>Hostel Management Team</p>
+      `;
+      // send email
+      await EmailService.sendEmail(newGuard.email, emailSubject, emailBody);
+
+    }
+
      
 
      res.status(201).json({
