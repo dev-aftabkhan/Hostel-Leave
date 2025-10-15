@@ -22,7 +22,7 @@ exports.createWarden = async (req, res) => {
       const emailSubject = "Hostel Leave Account Credentials";
       const emailBody = `
         <p>Dear <b>${warden.name}</b>,</p>
-        <p>Your warden account has been created successfully. Here are your login credentials:</p>
+        <p>Your warden  account has been created successfully. Here are your login credentials:</p>
         <ul>
           <li><b>Employee ID:</b> ${warden.emp_id}</li>
           <li><b>Password:</b> ${plainPassword}</li>

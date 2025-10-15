@@ -74,6 +74,14 @@ const getAllRequestsByHostelIdAndMonth = async (hostelId, month) => {
   }).sort({ created_at: -1 })
     .lean();
 
+  // map student info
+  for (let request of requests) {
+    const studentInfo = students.find((student) => student.enrollment_no === request.student_enrollment_number);
+    if (studentInfo) {
+      request.student_info = studentInfo;
+    }
+  }
+
   if (!requests || requests.length === 0) throw new Error("No requests found for this hostel and month");
   return requests;
 };
@@ -150,7 +158,7 @@ const getAllActiveRequests = async (hostelId) => {
 
   const parents = await Parent.find({ student_enrollment_no: { $in: studentIds } }).select("-password_hash -_id");
   if (!parents || parents.length === 0) throw new Error("No parents found for students in this hostel");
-  console.log(parents);
+  
   const requests = await Request.find({
     student_enrollment_number: { $in: studentIds },
     active: true
@@ -172,7 +180,7 @@ const getAllActiveRequests = async (hostelId) => {
   }
 
   if (!requests || requests.length === 0) throw new Error("No requests found for this hostel");
-
+   
   return requests;
 };
 
