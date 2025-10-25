@@ -13,7 +13,9 @@ exports.updateRequestStatus = async (requestId, userID, status, remark) => {
     "accepted_by_parent",
     "rejected_by_parent",
     "accepted_by_warden",
-    "rejected_by_warden"
+    "rejected_by_warden",
+    "out",
+    "in"
   ];
 
   if (!validStatuses.includes(status)) {
