@@ -1,176 +1,175 @@
-# Hostel Leave Backend
+# 🏫 Hostel Leave Backend
 
-A Node.js (Express + MongoDB) backend for a university hostel leave management system. This API handles student leave requests and the approval workflow across multiple roles: Student, Parent, Assistant Warden, Senior Warden, Security Guard, and Admin.
+A **Node.js (Express + MongoDB)** backend for a university **hostel leave management system**.
+It manages **student leave requests** and an **approval workflow** involving multiple roles:
 
-The core workflow:
+> **Student → Parent → Assistant Warden → Senior Warden → Security Guard → Admin**
 
-- Student creates a leave/out request.
-- Assistant Warden (or Warden) may refer/cancel the request.
-- Parent receives request and can accept/deny it.
-- Senior Warden approves or rejects the final request.
-- Security Gate signs the student out/in when they leave or return.
+---
 
-This repository implements role-based endpoints, JWT authentication, email notifications, file uploads (profile pictures), and MongoDB persistence using Mongoose.
+## 🚀 Core Workflow
 
-## Features
+1. **Student** creates a leave/out request.
+2. **Assistant Warden/Warden** reviews, refers, or cancels it.
+3. **Parent** accepts or denies the request.
+4. **Senior Warden** gives final approval or rejection.
+5. **Security Guard** records student exit and re-entry.
 
-- Multi-role workflow: Student, Parent, Assistant Warden, Senior Warden, Security Guard, Admin
-- JWT-based authentication and middleware-protected routes
-- Email notifications (Nodemailer + EJS templates)
-- File uploads for profile pictures (Multer)
-- MongoDB (Mongoose) models for users, requests, hostels, branches, etc.
-- Simple, opinionated REST API organized by role
+---
 
-## Tech stack
+## ✨ Features
 
-- Node.js
-- Express
-- MongoDB + Mongoose
-- JWT (jsonwebtoken)
-- Nodemailer + EJS (email templates)
-- Multer (file upload)
-- bcryptjs (password hashing)
+* Multi-role access: **Student, Parent, Assistant Warden, Senior Warden, Security Guard, Admin**
+* **JWT authentication** with role-based route protection
+* **Email notifications** (Nodemailer + EJS templates)
+* **File uploads** for profile pictures (Multer)
+* **MongoDB (Mongoose)** models for users, requests, hostels, branches, etc.
+* Well-structured **REST API** organized by role
 
-## Project structure (selected)
+---
 
-- `app.js` — Express app and route registration
-- `server.js` — server launcher
-- `config/db.js` — MongoDB connection
-- `routes/` — route definitions per role
-- `controller/` — route handlers (business logic)
-- `models/` — Mongoose schemas
-- `services/` — reusable service logic
-- `middleware/` — auth, upload middlewares
-- `utils/` — jwt, email and helper utilities
+## 🧩 Tech Stack
 
-## Getting started
+| Category         | Technology                 |
+| ---------------- | -------------------------- |
+| Runtime          | Node.js                    |
+| Framework        | Express                    |
+| Database         | MongoDB + Mongoose         |
+| Auth             | JWT (`jsonwebtoken`)       |
+| Emails           | Nodemailer + EJS templates |
+| File Uploads     | Multer                     |
+| Password Hashing | bcryptjs                   |
 
-### Prerequisites
+---
 
-- Node.js (v16+ recommended)
-- npm (bundled with Node.js)
-- MongoDB instance (URI)
-
-### Environment variables
-
-Create a `.env` file in the project root with at least the following variables:
-
-- `PORT` — (optional) server port, default 5000
-- `MONGO_URI` — MongoDB connection string
-- `JWT_SECRET` — secret used to sign JWTs
-- `EMAIL_HOST` — SMTP host (for sending emails)
-- `EMAIL_PORT` — SMTP port
-- `EMAIL_SECURE` — `true` when using TLS/SSL (465), otherwise `false`
-- `EMAIL_USER` — SMTP username
-- `EMAIL_PASS` — SMTP password
-- `EMAIL_FROM` — Sender address shown in outgoing mail
-
-Example `.env` snippet:
+## 📁 Project Structure
 
 ```
+app.js             → Express app & route registration
+server.js          → Server launcher
+config/db.js       → MongoDB connection
+routes/            → Route definitions (by role)
+controller/        → Business logic
+models/            → Mongoose schemas
+services/          → Reusable service logic
+middleware/        → Auth & file upload middlewares
+utils/             → JWT, email, and helper utilities
+```
+
+---
+
+## ⚙️ Getting Started
+
+### 1. Prerequisites
+
+* Node.js (v16+)
+* npm (bundled with Node.js)
+* MongoDB instance (local or cloud)
+
+### 2. Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
 PORT=5000
 MONGO_URI=mongodb+srv://<user>:<pass>@cluster0.mongodb.net/hostel-leave
 JWT_SECRET=change-this-secret
+
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_SECURE=false
 EMAIL_USER=you@example.com
 EMAIL_PASS=yourpassword
-EMAIL_FROM=Hostel Leave <noreply@example.com>
+EMAIL_FROM="Hostel Leave <noreply@example.com>"
 ```
 
-### Install & run
+| Variable     | Description                                |
+| ------------ | ------------------------------------------ |
+| `PORT`       | Server port (default: 5000)                |
+| `MONGO_URI`  | MongoDB connection string                  |
+| `JWT_SECRET` | JWT signing secret                         |
+| `EMAIL_*`    | SMTP configuration for email notifications |
 
-1. Install dependencies
+---
 
-```
+### 3. Install & Run
+
+```bash
 npm install
-```
-
-2. Start the server
-
-```
 npm start
 ```
 
-3. The app listens on `http://0.0.0.0:PORT` (default `5000`).
+Server runs at **[http://0.0.0.0:5000](http://0.0.0.0:5000)** (default).
+Static uploads served at `/uploads`.
 
-Static uploaded files are served from the `/uploads` directory at `/uploads`.
+---
 
-## API overview
+## 🔗 API Overview
 
-Base path: `/api`
+> **Base path:** `/api`
+> All routes are JWT-protected (`Authorization: Bearer <token>`) unless marked **public**.
 
-All endpoints listed below are protected by JWT (`Authorization: Bearer <token>`) unless noted otherwise.
+### 🧑‍💼 Admin (`/api/admin`)
 
-- Admin (`/api/admin`)
-	- POST `/create-warden` (auth) — Create a warden
-	- PUT `/update-warden/:emp_id` (auth) — Update warden by employee ID
-	- GET `/all-wardens` (auth) — List wardens
-	- POST `/create-admin` (auth)
-	- PUT `/update-admin/:emp_id` (auth)
-	- GET `/all-admins` (auth)
-	- POST `/create-hostel` (auth)
-	- PUT `/update-hostel/:hostel_id` (auth)
-	- PUT `/inactive-hostel/:hostel_id` (auth)
-	- GET `/hostel/:hostel_id` (auth)
-	- POST `/create-student` (auth)
-	- PUT `/update-student/:student_enrollment_no` (auth)
-	- GET `/student/:student_enrollment_no` (auth)
-	- GET `/total-students` (auth)
-	- GET `/outstudents` (auth)
-	- GET `/all-students` (auth) — includes parent data
-	- POST `/login/admin` — Admin login (public)
-	- POST `/create-branch` (auth)
-	- POST `/update-branch/:branch_id` (auth)
-	- PUT `/reset-password` (auth)
-	- POST `/create-security-guard` (auth)
-	- PUT `/update-security-guard/:emp_id` (auth)
-	- GET `/all-security-guards` (auth)
-	- GET `/all-active-requests` (auth)
-	- PUT `/reset-password-by-admin` (auth)
+* **POST** `/login/admin` — Admin login (**public**)
+* **POST** `/create-warden` / **PUT** `/update-warden/:emp_id` — Manage wardens
+* **GET** `/all-wardens` — List all wardens
+* **POST** `/create-admin` / **PUT** `/update-admin/:emp_id`
+* **GET** `/all-admins`
+* **POST** `/create-hostel` / **PUT** `/update-hostel/:hostel_id` / **PUT** `/inactive-hostel/:hostel_id`
+* **GET** `/hostel/:hostel_id`
+* **POST** `/create-student` / **PUT** `/update-student/:student_enrollment_no`
+* **GET** `/student/:student_enrollment_no` / `/all-students` / `/total-students` / `/outstudents`
+* **POST** `/create-branch` / **POST** `/update-branch/:branch_id`
+* **PUT** `/reset-password` / `/reset-password-by-admin`
+* **POST** `/create-security-guard` / **PUT** `/update-security-guard/:emp_id`
+* **GET** `/all-security-guards` / `/all-active-requests`
 
-- Warden (`/api/warden`)
-	- POST `/login/warden` — Warden login (public)
-	- GET `/allRequest/:hostelId` (auth) — get active requests for a hostel
-	- GET `/profile` (auth)
-	- GET `/requests/:hostelId/:month` (auth)
-	- GET `/statistics/:hostelId` (auth)
-	- GET `/allActiveRequests/:hostelId` (auth)
+---
 
-- Student (`/api/student`)
-	- POST `/login` — Student login (public)
-	- PUT `/profile` (auth) — Update profile (multipart: `profile_pic`)
-	- GET `/hostel-info` (auth)
-	- GET `/all-hostel-info` (auth)
-	- GET `/all-branches` (auth)
-	- GET `/student-profile` (auth)
-	- POST `/create-request` (auth) — Create a leave request
-	- GET `/requests` (auth) — Get all requests by student
+### 🏢 Warden (`/api/warden`)
 
-- Request (`/api/request`)
-	- PUT `/update-status` (auth) — Update status of a request
-	- GET `/ByStatus/:status` (auth)
-	- GET `/inactive-requests` (auth)
-	- GET `/requests/:status` (auth) — by student enrollment no & status
-	- GET `/request/:id` (auth)
-	- GET `/hostel-requests/:hostelId` (auth)
+* **POST** `/login/warden` — Warden login (**public**)
+* **GET** `/allRequest/:hostelId` — Active requests for hostel
+* **GET** `/profile`, `/statistics/:hostelId`, `/requests/:hostelId/:month`, `/allActiveRequests/:hostelId`
 
-- Parent (`/api/parent`)
-	- POST `/login` — Parent login (public)
-	- GET `/profile` (auth)
-	- GET `/allRequests` (auth) — requests for the parent's student
-	- GET `/student` (auth) — student info by enrollment
+---
 
-- Security (`/api/security`)
-	- POST `/login` — Security guard login (public)
-	- GET `/allRequests/:security_status` (auth)
+### 🎓 Student (`/api/student`)
 
-Notes:
-- The code organizes business logic in `controller/*` and `services/*`. Use those modules when extending the API.
+* **POST** `/login` — Student login (**public**)
+* **PUT** `/profile` — Update profile (`multipart/form-data: profile_pic`)
+* **GET** `/hostel-info`, `/all-hostel-info`, `/all-branches`, `/student-profile`
+* **POST** `/create-request` — Create leave request
+* **GET** `/requests` — Get all requests by student
 
-## Environment & deployment notes
+---
 
-- Keep `JWT_SECRET` and SMTP credentials secret.
-- In production, use a proper process manager (PM2, systemd) and secure environment variables through your hosting provider.
-- Consider enabling HTTPS and CORS policies for the frontend domain.
+### 📄 Request (`/api/request`)
+
+* **PUT** `/update-status` — Update request status
+* **GET** `/ByStatus/:status`, `/inactive-requests`, `/requests/:status`, `/request/:id`, `/hostel-requests/:hostelId`
+
+---
+
+### 👨‍👩‍👦 Parent (`/api/parent`)
+
+* **POST** `/login` — Parent login (**public**)
+* **GET** `/profile`, `/allRequests`, `/student`
+
+---
+
+### 🛡 Security (`/api/security`)
+
+* **POST** `/login` — Security guard login (**public**)
+* **GET** `/allRequests/:security_status` — Requests by security status
+
+---
+
+## 🧠 Developer Notes
+
+* Core business logic resides in `/controller` and `/services`.
+  Extend these for new workflows or roles.
+* Keep credentials (`JWT_SECRET`, SMTP) secure.
+* Use **PM2** or **systemd** for production process management.
+* Enable **HTTPS** and configure **CORS** for frontend security.
